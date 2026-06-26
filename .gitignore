@@ -1,0 +1,30 @@
+# Build artifacts
+build/
+build_deps/
+bin/
+*.obj
+*.lib
+*.exp
+*.exe
+*.pdb
+*.ilk
+
+# IDE files
+.vs/
+.idea/
+*.user
+*.suo
+
+# OS files
+*.db
+Thumbs.db
+.DS_Store
+
+# Logs
+*.log
+logs/
+
+# MinGW artifacts
+*.o
+*.dll
+*.a
