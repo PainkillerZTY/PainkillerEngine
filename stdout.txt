@@ -1,0 +1,16 @@
+[14:01:29][INFO](G:/AI_projects/test3/src/engine/Engine.cpp:10) Nebula Engine v0.1.0 initializing...
+[14:01:29][INFO](G:/AI_projects/test3/src/engine/Window.cpp:68) Window created: 1280x720 - Nebula Engine v0.1.0 - Demo
+[14:01:29][INFO](G:/AI_projects/test3/src/render/OpenGLRenderer.cpp:152) Initializing OpenGL 3.3 Core...
+[14:01:29][INFO](G:/AI_projects/test3/src/render/OpenGLRenderer.cpp:172) OpenGL: 3.3.0 - Build 32.0.101.7082
+[14:01:29][INFO](G:/AI_projects/test3/src/demo/DemoApp.cpp:87) DemoApp initializing...
+[14:01:29][INFO](G:/AI_projects/test3/src/resource/ResourceManager.cpp:22) Loaded mesh: cube
+[14:01:29][INFO](G:/AI_projects/test3/src/resource/ResourceManager.cpp:22) Loaded mesh: plane
+[14:01:29][INFO](G:/AI_projects/test3/src/resource/ResourceManager.cpp:22) Loaded mesh: sphere
+[14:01:29][DEBUG](G:/AI_projects/test3/src/scene/Scene.cpp:16) Created entity: DirectionalLight (ID: 0)
+[14:01:29][DEBUG](G:/AI_projects/test3/src/scene/Scene.cpp:16) Created entity: CameraPivot (ID: 1)
+[14:01:29][DEBUG](G:/AI_projects/test3/src/scene/Scene.cpp:16) Created entity: Ground (ID: 2)
+[14:01:29][DEBUG](G:/AI_projects/test3/src/scene/Scene.cpp:16) Created entity: MainCube (ID: 3)
+[14:01:29][DEBUG](G:/AI_projects/test3/src/scene/Scene.cpp:16) Created entity: Orbiter (ID: 4)
+[14:01:29][INFO](G:/AI_projects/test3/src/demo/DemoApp.cpp:186) DemoApp initialized successfully
+[14:01:29][INFO](G:/AI_projects/test3/src/engine/Engine.cpp:57) Nebula Engine initialized successfully
+[14:01:29][INFO](G:/AI_projects/test3/src/engine/Engine.cpp:95) Engine entering main loop

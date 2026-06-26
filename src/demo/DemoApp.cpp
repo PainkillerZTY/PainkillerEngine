@@ -237,18 +237,12 @@ void DemoApp::Update(Engine* engine, f32 deltaTime) {
 
 // ?? Render ??
 void DemoApp::Render(Engine* engine, f32 deltaTime) {
-    auto* renderer = engine->GetRenderer();
-    auto* scene = engine->GetScene();
-    
+    (void)engine; (void)deltaTime;
     if (!m_pipelineCreated) return;
-    
-    // Bind pipeline and update shared uniforms
-    renderer->BindPipelineState(m_pipeline);
-    
-    // Uniforms are set per-entity in Scene::RenderScene
+    engine->GetRenderer()->BindPipelineState(m_pipeline);
 }
 
-// ?? Shutdown ??
+
 void DemoApp::Shutdown(Engine* engine) {
     LOG_INFO("DemoApp shutting down...");
     auto* renderer = engine->GetRenderer();

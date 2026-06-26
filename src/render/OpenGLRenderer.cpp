@@ -123,7 +123,14 @@ static void (APIENTRY *pfnDrawElements)(GLenum, GLsizei, GLenum, const GLvoid*);
 static void (APIENTRY *pfnBindBufferBase)(GLenum, GLuint, GLuint);
 static void (APIENTRY *pfnDrawElementsBaseVertex)(GLenum, GLsizei, GLenum, const GLvoid*, GLint);
 
-#define LOAD_FN(name) pfn##name = (decltype(pfn##name))wglGetProcAddress("gl" #name)
+#define LOAD_FN(name) do { \
+    pfn##name = (decltype(pfn##name))wglGetProcAddress("gl" #name); \
+    if(!pfn##name) { \
+        static HMODULE hGL = GetModuleHandleA("opengl32.dll"); \
+        if(hGL) pfn##name = (decltype(pfn##name))GetProcAddress(hGL, "gl" #name); \
+    } \
+    if(!pfn##name) LOG_WARN("gl{} not loaded, may crash", #name); \
+} while(0)
 
 static bool LoadGLFunctions() {
     LOAD_FN(GenBuffers); LOAD_FN(BindBuffer); LOAD_FN(BufferData); LOAD_FN(BufferSubData);
@@ -152,7 +159,7 @@ bool OpenGLRenderer::Initialize(u32 width, u32 height, void* windowHandle) {
     HGLRC temp = wglCreateContext(hdc);
     if (!temp) { LOG_ERROR("wglCreateContext failed"); return false; }
     wglMakeCurrent(hdc, temp);
-    LoadGLFunctions();
+    LoadGLFunctions();  // Warnings logged inside
     typedef HGLRC(WINAPI *WCARB)(HDC, HGLRC, const int*);
     WCARB wglCtx = (WCARB)wglGetProcAddress("wglCreateContextAttribsARB");
     HGLRC ctx = nullptr;
@@ -263,4 +270,6 @@ u32 OpenGLRenderer::GetGLTopology(PrimitiveTopology t)const{switch(t){case Primi
 u32 OpenGLRenderer::GetGLBufferType(BufferType t)const{switch(t){case BufferType::Vertex:return GL_ARRAY_BUFFER;case BufferType::Index:return GL_ELEMENT_ARRAY_BUFFER;case BufferType::Constant:return GL_UNIFORM_BUFFER;default:return GL_ARRAY_BUFFER;}}
 
 } // namespace nebula
+
+
 
