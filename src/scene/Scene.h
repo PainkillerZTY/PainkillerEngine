@@ -6,11 +6,11 @@
 #include "Camera.h"
 #include "RenderTypes.h"
 #include "Renderer.h"
-#include "Components/TransformComponent.h"
-#include "Components/MeshComponent.h"
-#include "Components/CameraComponent.h"
-#include "Components/LightComponent.h"
-#include "Components/MaterialComponent.h"
+#include "components/TransformComponent.h"
+#include "components/MeshComponent.h"
+#include "components/CameraComponent.h"
+#include "components/LightComponent.h"
+#include "components/MaterialComponent.h"
 
 #include <vector>
 #include <string>
@@ -79,3 +79,4 @@ private:
 };
 
 } // namespace nebula
+

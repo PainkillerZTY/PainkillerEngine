@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Types.h"
+#include <windows.h>
 #include <string>
 #include <functional>
 
@@ -42,3 +43,6 @@ private:
 };
 
 } // namespace nebula
+
+
+

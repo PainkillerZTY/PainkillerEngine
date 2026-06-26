@@ -4,7 +4,7 @@
 #include <string>
 #include <sstream>
 #include <fstream>
-#include <mutex>
+#include <windows.h>
 
 namespace nebula {
 
@@ -57,7 +57,7 @@ public:
     }
 
 private:
-    Logger() = default;
+    Logger();
     ~Logger();
     Logger(const Logger&) = delete;
     Logger& operator=(const Logger&) = delete;
@@ -108,7 +108,7 @@ private:
     
     LogLevel m_level = LogLevel::Info;
     std::ofstream m_fileStream;
-    std::mutex m_mutex;
+    CRITICAL_SECTION m_criticalSection;
 };
 
 } // namespace nebula
@@ -119,3 +119,5 @@ private:
 #define LOG_INFO(...)    nebula::Logger::Instance().Info(__FILE__, __LINE__, __VA_ARGS__)
 #define LOG_WARN(...)    nebula::Logger::Instance().Warn(__FILE__, __LINE__, __VA_ARGS__)
 #define LOG_ERROR(...)   nebula::Logger::Instance().Error(__FILE__, __LINE__, __VA_ARGS__)
+
+

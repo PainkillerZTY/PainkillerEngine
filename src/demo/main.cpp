@@ -36,7 +36,7 @@ int main() {
 
     // Run
     if (!engine.Initialize(config)) {
-        nebula::LOG_ERROR("Engine initialization failed");
+        LOG_ERROR("Engine initialization failed");
         return EXIT_FAILURE;
     }
 
@@ -44,3 +44,4 @@ int main() {
 
     return EXIT_SUCCESS;
 }
+

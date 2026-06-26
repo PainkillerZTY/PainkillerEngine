@@ -3,7 +3,7 @@
 #include "Vector.h"
 #include "Matrix.h"
 #include "Math.h"
-#include "Components/CameraComponent.h"
+#include "components/CameraComponent.h"
 
 namespace nebula {
 
@@ -69,3 +69,4 @@ private:
 };
 
 } // namespace nebula
+

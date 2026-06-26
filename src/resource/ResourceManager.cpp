@@ -33,6 +33,7 @@ bool ResourceManager::HasMesh(const std::string& name) const {
 }
 
 ShaderHandle ResourceManager::LoadShader(const std::string& name, ShaderStage stage, const std::string& source) {
+    (void)name;
     if (!m_renderer) return kInvalidHandle;
     
     ShaderDesc desc;
@@ -45,7 +46,6 @@ TextureHandle ResourceManager::LoadTexture(const std::string& name, const std::s
     auto it = m_textureCache.find(name);
     if (it != m_textureCache.end()) return it->second;
     
-    // TODO: stb_image loading
     LOG_WARN("Texture loading not yet implemented: {}", filepath);
     return kInvalidHandle;
 }
@@ -61,13 +61,13 @@ TextureHandle ResourceManager::CreateTexture(const std::string& name, const Text
 void ResourceManager::Shutdown() {
     if (!m_renderer) return;
     
-    for (auto& [name, handle] : m_meshCache) {
-        m_renderer->DestroyMesh(handle);
+    for (auto it = m_meshCache.begin(); it != m_meshCache.end(); ++it) {
+        m_renderer->DestroyMesh(it->second);
     }
     m_meshCache.clear();
     
-    for (auto& [name, handle] : m_textureCache) {
-        m_renderer->DestroyTexture(handle);
+    for (auto it = m_textureCache.begin(); it != m_textureCache.end(); ++it) {
+        m_renderer->DestroyTexture(it->second);
     }
     m_textureCache.clear();
     

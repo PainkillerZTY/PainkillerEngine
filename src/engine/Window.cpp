@@ -5,7 +5,7 @@ namespace nebula {
 
 // ?? Window Class Registration ??
 static bool g_windowClassRegistered = false;
-static const wchar_t* kWindowClassName = L"NebulaEngineWindow";
+static const char* kWindowClassName = "NebulaEngineWindow";
 
 bool Window::Initialize(u32 width, u32 height, const std::string& title) {
     m_width = width;
@@ -34,19 +34,15 @@ bool Window::Initialize(u32 width, u32 height, const std::string& title) {
     }
     
     // Convert title to wide string
-    int wideLen = MultiByteToWideChar(CP_UTF8, 0, title.c_str(), -1, nullptr, 0);
-    std::wstring wideTitle(wideLen, L'\0');
-    MultiByteToWideChar(CP_UTF8, 0, title.c_str(), -1, &wideTitle[0], wideLen);
-    
     // Calculate window size with client area
     RECT rect = { 0, 0, (LONG)width, (LONG)height };
     AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, FALSE);
     
     // Create window
-    m_handle = CreateWindowExW(
+    m_handle = CreateWindowExA(
         0,
         kWindowClassName,
-        wideTitle.c_str(),
+        title.c_str(),
         WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT, CW_USEDEFAULT,
         rect.right - rect.left,
@@ -131,3 +127,6 @@ LRESULT CALLBACK Window::WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 }
 
 } // namespace nebula
+
+
+
