@@ -4,7 +4,7 @@
 #include "RenderTypes.h"
 #include "Renderer.h"
 
-namespace nebula {
+namespace painkiller {
 
 struct Mesh {
     MeshData data;
@@ -13,4 +13,4 @@ struct Mesh {
     virtual ~Mesh() = default;
 };
 
-} // namespace nebula
+} // namespace painkiller

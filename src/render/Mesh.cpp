@@ -2,7 +2,7 @@
 #include "Vector.h"
 #include <cmath>
 
-namespace nebula {
+namespace painkiller {
 
 // ?? Cube ??
 MeshData MeshData::CreateCube(f32 size) {
@@ -154,4 +154,4 @@ MeshData MeshData::CreateTriangle() {
     return data;
 }
 
-} // namespace nebula
+} // namespace painkiller

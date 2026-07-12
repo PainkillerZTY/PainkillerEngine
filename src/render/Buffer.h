@@ -3,7 +3,7 @@
 #include "Types.h"
 #include "RenderTypes.h"
 
-namespace nebula {
+namespace painkiller {
 
 struct Buffer {
     BufferType type;
@@ -15,4 +15,4 @@ struct Buffer {
     virtual ~Buffer() = default;
 };
 
-} // namespace nebula
+} // namespace painkiller

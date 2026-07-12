@@ -1,6 +1,9 @@
 #include "OpenGLRenderer.h"
 #include "Logger.h"
 
+// Cubemap defines
+
+
 // ?? Manually define modern GL constants/extensions (MinGW too old) ??
 #ifdef GL_GLEXT_PROTOTYPES
 #undef GL_GLEXT_PROTOTYPES
@@ -64,6 +67,10 @@
 #endif
 
 // GL constant for texture units
+#ifndef GL_CLAMP_TO_EDGE
+#define GL_CLAMP_TO_EDGE 0x812F
+#endif
+
 #ifndef GL_TEXTURE0
 #define GL_TEXTURE0 0x84C0
 #endif
@@ -78,7 +85,7 @@
 #define WGL_CONTEXT_CORE_PROFILE_BIT_ARB 0x00000001
 #endif
 
-namespace nebula {
+namespace painkiller {
 
 // ?? Function pointer declarations ??
 static void (APIENTRY *pfnDeleteBuffers)(GLsizei, const GLuint*);
@@ -168,7 +175,8 @@ bool OpenGLRenderer::Initialize(u32 width, u32 height, void* windowHandle) {
     wglMakeCurrent(0,0); wglDeleteContext(temp); wglMakeCurrent(hdc, ctx);
     typedef BOOL(WINAPI *SWAP)(int); SWAP si = (SWAP)wglGetProcAddress("wglSwapIntervalEXT"); if (si) si(1);
     glEnable(GL_DEPTH_TEST); glDepthFunc(GL_LESS); glEnable(GL_CULL_FACE); glCullFace(GL_BACK); glFrontFace(GL_CCW);
-    glClearColor(0.1f,0.1f,0.15f,1.0f);
+    glEnable(GL_BLEND); glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glClearColor(0.5f,0.7f,0.95f,1.0f);
     LOG_INFO("OpenGL: {}", (const char*)glGetString(GL_VERSION));
     m_initialized = true; return true;
 }
@@ -269,7 +277,7 @@ void OpenGLRenderer::OnResize(u32 w,u32 h){m_width=w;m_height=h;glViewport(0,0,(
 u32 OpenGLRenderer::GetGLTopology(PrimitiveTopology t)const{switch(t){case PrimitiveTopology::TriangleList:return GL_TRIANGLES;case PrimitiveTopology::TriangleStrip:return GL_TRIANGLE_STRIP;case PrimitiveTopology::LineList:return GL_LINES;case PrimitiveTopology::LineStrip:return GL_LINE_STRIP;case PrimitiveTopology::PointList:return GL_POINTS;default:return GL_TRIANGLES;}}
 u32 OpenGLRenderer::GetGLBufferType(BufferType t)const{switch(t){case BufferType::Vertex:return GL_ARRAY_BUFFER;case BufferType::Index:return GL_ELEMENT_ARRAY_BUFFER;case BufferType::Constant:return GL_UNIFORM_BUFFER;default:return GL_ARRAY_BUFFER;}}
 
-} // namespace nebula
+} // namespace painkiller
 
 
 

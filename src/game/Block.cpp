@@ -1,6 +1,6 @@
 ﻿#include "Block.h"
 
-namespace nebula {
+namespace painkiller {
 
 // ============================================================
 // BlockInfo table
@@ -57,4 +57,4 @@ f32 BlockInfo::GetHardness(BlockType type) {
     return Get(type).hardness;
 }
 
-} // namespace nebula
+} // namespace painkiller

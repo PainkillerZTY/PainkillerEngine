@@ -1,7 +1,7 @@
 #include "DemoApp.h"
 #include "Logger.h"
 
-namespace nebula {
+namespace painkiller {
 
 // ?? Embedded Shader Sources ??
 
@@ -258,4 +258,4 @@ void DemoApp::Shutdown(Engine* engine) {
     }
 }
 
-} // namespace nebula
+} // namespace painkiller

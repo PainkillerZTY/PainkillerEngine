@@ -1,2 +1,2 @@
 #include "Texture.h"
-namespace nebula {} // namespace
+namespace painkiller {} // namespace

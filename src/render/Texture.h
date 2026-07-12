@@ -3,7 +3,7 @@
 #include "Types.h"
 #include "RenderTypes.h"
 
-namespace nebula {
+namespace painkiller {
 
 struct Texture {
     u32 width = 0;
@@ -16,4 +16,4 @@ struct Texture {
     virtual ~Texture() = default;
 };
 
-} // namespace nebula
+} // namespace painkiller

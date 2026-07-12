@@ -10,11 +10,11 @@
 #include <memory>
 #include <string>
 
-namespace nebula {
+namespace painkiller {
 
 // ?? Engine Configuration ??
 struct EngineConfig {
-    std::string title = "Nebula Engine";
+     std::string title = "Painkiller Engine";
     u32 width = 1280;
     u32 height = 720;
     RenderBackend backend = RenderBackend::OpenGL;
@@ -82,4 +82,4 @@ private:
     ShutdownCallback m_onShutdown;
 };
 
-} // namespace nebula
+} // namespace painkiller

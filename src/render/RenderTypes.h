@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-namespace nebula {
+namespace painkiller {
 
 enum class PrimitiveTopology : u8 {
     TriangleList, TriangleStrip, LineList, LineStrip, PointList,
@@ -52,4 +52,4 @@ struct MeshData {
     static MeshData CreateTriangle();
 };
 
-} // namespace nebula
+} // namespace painkiller

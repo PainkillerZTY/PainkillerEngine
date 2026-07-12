@@ -10,7 +10,7 @@
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-namespace nebula {
+namespace painkiller {
 
 using Vec2 = glm::vec2;
 using Vec2i = glm::ivec2;
@@ -49,4 +49,4 @@ struct BoundingBox {
     }
 };
 
-} // namespace nebula
+} // namespace painkiller

@@ -3,7 +3,7 @@
 #include "Component.h"
 #include "RenderTypes.h"
 
-namespace nebula {
+namespace painkiller {
 
 // ?? Mesh Component ??
 struct MeshComponent {
@@ -11,4 +11,4 @@ struct MeshComponent {
     // Will extend with material assignments later
 };
 
-} // namespace nebula
+} // namespace painkiller

@@ -2,7 +2,7 @@
 #include "Logger.h"
 #include <cstring>
 
-namespace nebula {
+namespace painkiller {
 
 // ============================================================
 // Construction
@@ -41,10 +41,10 @@ static const Vec3 kFaceVerts[6][4] = {
     { Vec3(1,0,0), Vec3(1,1,0), Vec3(1,1,1), Vec3(1,0,1) },
     // -X (Left)
     { Vec3(0,0,1), Vec3(0,1,1), Vec3(0,1,0), Vec3(0,0,0) },
-    // +Y (Top)
-    { Vec3(0,1,0), Vec3(1,1,0), Vec3(1,1,1), Vec3(0,1,1) },
-    // -Y (Bottom)
-    { Vec3(0,0,1), Vec3(1,0,1), Vec3(1,0,0), Vec3(0,0,0) },
+    // +Y (Top) - CCW when viewed from +Y
+    { Vec3(0,1,0), Vec3(0,1,1), Vec3(1,1,1), Vec3(1,1,0) },
+    // -Y (Bottom) - CCW when viewed from -Y
+    { Vec3(0,0,0), Vec3(1,0,0), Vec3(1,0,1), Vec3(0,0,1) },
     // +Z (Front)
     { Vec3(1,0,1), Vec3(1,1,1), Vec3(0,1,1), Vec3(0,0,1) },
     // -Z (Back)
@@ -136,7 +136,7 @@ void Chunk::GenerateMesh(i32 chunkX, i32 chunkZ) {
 
 // ============================================================
 // Add a face quad to the mesh (2 triangles, 4 vertices)
-// Vertex format: pos(3) + normal(3) + texcoord(2) = 8 floats
+// Vertex format: pos(3) + normal(3) + texcoord(2) + uv(2) = 10 floats
 // texcoord encodes (blockType/255, faceIndex/6)
 // ============================================================
 void Chunk::AddFace(const Vec3& v0, const Vec3& v1, const Vec3& v2, const Vec3& v3,
@@ -170,4 +170,4 @@ void Chunk::AddFace(const Vec3& v0, const Vec3& v1, const Vec3& v2, const Vec3& 
     m_indexCount += 6;
 }
 
-} // namespace nebula
+} // namespace painkiller

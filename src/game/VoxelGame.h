@@ -9,7 +9,7 @@
 #include "BlockRaycast.h"
 #include "Block.h"
 
-namespace nebula {
+namespace painkiller {
 
 // ============================================================
 // VoxelGame: Main game orchestrator
@@ -31,6 +31,7 @@ private:
     void RenderWorld(Renderer* renderer, Camera* camera);
     void RenderUI(Renderer* renderer, f32 winW, f32 winH);
     void RenderCrosshair(Renderer* renderer);
+    void RenderHeldBlock(Renderer* renderer, Camera* camera);
     void RenderDebugInfo(Engine* engine);
 
     // World
@@ -55,14 +56,28 @@ private:
 
     // UI meshes
     MeshHandle m_crosshairMesh = kInvalidHandle;
+    MeshHandle m_whiteQuadMesh = kInvalidHandle;
+    MeshHandle m_heldBlockMesh = kInvalidHandle;
+    ShaderHandle m_skyboxVS = kInvalidHandle;
+    ShaderHandle m_skyboxFS = kInvalidHandle;
+    PipelineHandle m_skyboxPipeline = kInvalidHandle;
+    MeshHandle m_skyboxMesh = kInvalidHandle;
+
 
     // State
     bool m_initialized = false;
     bool m_pipelineCreated = false;
 
-    // Block interaction
-    BlockRaycastResult m_raycastResult;
-
+     // Block interaction
+     BlockRaycastResult m_raycastResult;
+     
+     // Hotbar: selected block index (index into hotbar array)
+     i32 m_selectedSlot = 0;
+     static constexpr i32 kHotbarSlots = 9;
+     void HandleHotbarSelection(Input* input);
+     BlockType GetSelectedBlock() const;
+     void RenderHotbar(Renderer* renderer, f32 winW, f32 winH);
+ 
     // Block breaking
     bool m_isBreaking = false;
     f32 m_breakTimer = 0.0f;
@@ -72,9 +87,12 @@ private:
     // Block placing cooldown
     f32 m_placeCooldown = 0.0f;
 
-    // Game state
-    u32 m_seed = 42;
-    f32 m_gameTime = 0.0f;
+     // Texture atlas for block faces
+     TextureHandle m_blockAtlas = kInvalidHandle;
+     
+     // Game state
+     u32 m_seed = 42;
+     f32 m_gameTime = 0.0f;
 };
 
-} // namespace nebula
+} // namespace painkiller

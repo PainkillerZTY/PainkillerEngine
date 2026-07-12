@@ -5,7 +5,7 @@
 #include <vector>
 #include <array>
 
-namespace nebula {
+namespace painkiller {
 
 // ============================================================
 // Chunk constants
@@ -30,7 +30,7 @@ struct ChunkPos {
     // Hash for unordered_map
     struct Hash {
         usize operator()(const ChunkPos& p) const {
-            return ((usize)(p.x) << 32) ^ (usize)(p.z);
+            return ((usize)(p.x) << 16) ^ (usize)(p.z);
         }
     };
 };
@@ -109,4 +109,4 @@ inline void WorldToChunkCoords(i32 worldX, i32 worldY, i32 worldZ,
     localZ = worldZ - chunkZ * CHUNK_SIZE_Z;
 }
 
-} // namespace nebula
+} // namespace painkiller

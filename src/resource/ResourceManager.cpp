@@ -1,7 +1,8 @@
 #include "ResourceManager.h"
 #include "Logger.h"
+ #include "TextureLoader.h"
 
-namespace nebula {
+namespace painkiller {
 
 ResourceManager::ResourceManager(Renderer* renderer)
     : m_renderer(renderer) {
@@ -46,8 +47,18 @@ TextureHandle ResourceManager::LoadTexture(const std::string& name, const std::s
     auto it = m_textureCache.find(name);
     if (it != m_textureCache.end()) return it->second;
     
-    LOG_WARN("Texture loading not yet implemented: {}", filepath);
-    return kInvalidHandle;
+     // Load texture from file using TextureLoader
+     TextureDesc desc;
+     u8* data = nullptr;
+     if (!TextureLoader::LoadFromFile(filepath, desc, data)) {
+         return kInvalidHandle;
+     }
+     
+     TextureHandle handle = m_renderer->CreateTexture(desc);
+     TextureLoader::FreeLoadedData(data);
+     m_textureCache[name] = handle;
+     LOG_INFO("Loaded texture: {} -> {}", name, filepath);
+     return handle;
 }
 
 TextureHandle ResourceManager::CreateTexture(const std::string& name, const TextureDesc& desc) {
@@ -74,4 +85,4 @@ void ResourceManager::Shutdown() {
     LOG_INFO("ResourceManager shut down");
 }
 
-} // namespace nebula
+} // namespace painkiller

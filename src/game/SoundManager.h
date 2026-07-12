@@ -4,7 +4,7 @@
 #include <string>
 #include <windows.h>
 
-namespace nebula {
+namespace painkiller {
 
 // ============================================================
 // SoundManager: Simple sound effects via Win32 PlaySound
@@ -26,4 +26,4 @@ private:
     bool m_initialized = false;
 };
 
-} // namespace nebula
+} // namespace painkiller

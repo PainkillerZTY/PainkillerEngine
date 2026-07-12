@@ -4,30 +4,30 @@
 #include <cstdlib>
 
 int main() {
-    nebula::EngineConfig config;
-    config.title = "Nebula Engine - Minecraft-Like Demo";
+    painkiller::EngineConfig config;
+     config.title = "Painkiller Engine - Minecraft-Like Demo";
     config.width = 1280;
     config.height = 720;
-    config.backend = nebula::RenderBackend::OpenGL;
+    config.backend = painkiller::RenderBackend::OpenGL;
     config.vsync = true;
 
-    nebula::Engine engine;
-    nebula::VoxelGame game;
+    painkiller::Engine engine;
+    painkiller::VoxelGame game;
 
-    engine.SetOnInit([&game](nebula::Engine* engine) -> bool {
-        nebula::Logger::Instance().SetLevel(nebula::LogLevel::Info);
+    engine.SetOnInit([&game](painkiller::Engine* engine) -> bool {
+        painkiller::Logger::Instance().SetLevel(painkiller::LogLevel::Info);
         return game.Initialize(engine);
     });
 
-    engine.SetOnUpdate([&game](nebula::Engine* engine, nebula::f32 dt) {
+    engine.SetOnUpdate([&game](painkiller::Engine* engine, painkiller::f32 dt) {
         game.Update(engine, dt);
     });
 
-    engine.SetOnRender([&game](nebula::Engine* engine, nebula::f32 dt) {
+    engine.SetOnRender([&game](painkiller::Engine* engine, painkiller::f32 dt) {
         game.Render(engine, dt);
     });
 
-    engine.SetOnShutdown([&game](nebula::Engine* engine) {
+    engine.SetOnShutdown([&game](painkiller::Engine* engine) {
         game.Shutdown(engine);
     });
 

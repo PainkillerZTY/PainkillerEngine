@@ -2,7 +2,7 @@
 #include "Logger.h"
 #include <algorithm>
 
-namespace nebula {
+namespace painkiller {
 
 EntityID Scene::CreateEntity(const std::string& name) {
     EntityID id = m_nextEntityID++;
@@ -149,4 +149,4 @@ void Scene::RenderScene(Renderer* renderer, f32 deltaTime) {
     }
 }
 
-} // namespace nebula
+} // namespace painkiller

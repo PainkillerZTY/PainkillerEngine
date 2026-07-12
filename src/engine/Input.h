@@ -3,7 +3,7 @@
 #include "Types.h"
 #include <array>
 
-namespace nebula {
+namespace painkiller {
 
 // ?? Input Manager ??
 class Input {
@@ -21,8 +21,9 @@ public:
     
     i32 GetMouseX() const { return m_mouseX; }
     i32 GetMouseY() const { return m_mouseY; }
-    i32 GetMouseDeltaX() const { return m_mouseDeltaX; }
-    i32 GetMouseDeltaY() const { return m_mouseDeltaY; }
+     // Prefer raw input deltas (hardware-level, no cursor-warp pollution)
+     i32 GetMouseDeltaX() const { return m_rawDeltaX != 0 ? m_rawDeltaX : m_mouseDeltaX; }
+     i32 GetMouseDeltaY() const { return m_rawDeltaY != 0 ? m_rawDeltaY : m_mouseDeltaY; }
     i32 GetScrollDelta() const { return m_scrollDelta; }
     
     // ?? Update (called by Engine) ??
@@ -32,8 +33,14 @@ public:
     void OnMouseMove(i32 x, i32 y);
     void OnMouseDown(u32 button);
     void OnMouseUp(u32 button);
-    void OnScroll(i32 delta);
-    
+     void OnScroll(i32 delta);
+     
+     // Reset tracking position without generating a delta (used after cursor warp)
+     void ResetMousePosition(i32 x, i32 y) { m_mouseX = x; m_mouseY = y; m_mouseDeltaX = 0; m_mouseDeltaY = 0; }
+     
+     // Raw input (hardware mouse deltas, from WM_INPUT)
+     void OnRawMouseDelta(i32 dx, i32 dy) { m_rawDeltaX += dx; m_rawDeltaY += dy; }
+
 private:
     static constexpr u32 kMaxKeys = 256;
     static constexpr u32 kMaxMouseButtons = 8;
@@ -46,9 +53,11 @@ private:
     
     i32 m_mouseX = 0;
     i32 m_mouseY = 0;
-    i32 m_mouseDeltaX = 0;
-    i32 m_mouseDeltaY = 0;
-    i32 m_scrollDelta = 0;
+     i32 m_mouseDeltaX = 0;
+     i32 m_mouseDeltaY = 0;
+     i32 m_rawDeltaX = 0;
+     i32 m_rawDeltaY = 0;
+     i32 m_scrollDelta = 0;
 };
 
-} // namespace nebula
+} // namespace painkiller

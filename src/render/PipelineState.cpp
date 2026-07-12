@@ -1,2 +1,2 @@
 #include "PipelineState.h"
-namespace nebula {} // namespace
+namespace painkiller {} // namespace

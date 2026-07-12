@@ -5,7 +5,7 @@
 #include "Math.h"
 #include "components/CameraComponent.h"
 
-namespace nebula {
+namespace painkiller {
 
 class Camera {
 public:
@@ -45,10 +45,15 @@ public:
         return GetProjectionMatrix() * GetViewMatrix();
     }
     
-    Vec3 GetPosition() const { return m_position; }
-    Vec3 GetForward() const;
-    Vec3 GetRight() const;
-    
+     Vec3 GetPosition() const { return m_position; }
+     Vec3 GetForward() const;
+     Vec3 GetRight() const;
+     
+     // Dynamic FOV (sprint FOV expansion, smooth transitions)
+     void SetTargetFOV(f32 fovDeg) { m_targetFOV = fovDeg; }
+     f32 GetTargetFOV() const { return m_targetFOV; }
+     void UpdateFOV(f32 deltaTime);
+
 private:
     void RecalculateView();
     void RecalculateProjection();
@@ -56,8 +61,9 @@ private:
     Vec3 m_position = Vec3(0.0f, 0.0f, 3.0f);
     Vec3 m_euler = Vec3(0.0f); // degrees
     
-    f32 m_fov = 60.0f;
-    f32 m_aspect = 16.0f / 9.0f;
+     f32 m_fov = 70.0f;
+     f32 m_targetFOV = 70.0f;  // 70 = default Bedrock FOV
+     f32 m_aspect = 16.0f / 9.0f;
     f32 m_near = 0.1f;
     f32 m_far = 100.0f;
     
@@ -68,5 +74,5 @@ private:
     bool m_projectionDirty = true;
 };
 
-} // namespace nebula
+} // namespace painkiller
 

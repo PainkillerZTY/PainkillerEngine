@@ -3,7 +3,7 @@
 #include "Component.h"
 #include "Transform.h"
 
-namespace nebula {
+namespace painkiller {
 
 // ?? Transform Component ??
 struct TransformComponent {
@@ -28,4 +28,4 @@ struct TransformComponent {
     }
 };
 
-} // namespace nebula
+} // namespace painkiller

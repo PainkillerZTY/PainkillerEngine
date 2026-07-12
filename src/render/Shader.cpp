@@ -1,7 +1,7 @@
 #include "Shader.h"
 
-namespace nebula {
+namespace painkiller {
 
 // Shader compilation handled by OpenGLRenderer
 
-} // namespace nebula
+} // namespace painkiller

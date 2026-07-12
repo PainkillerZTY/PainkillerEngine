@@ -1,7 +1,7 @@
 #include "Entity.h"
 
-namespace nebula {
+namespace painkiller {
 
 // Entity is primarily inline; this file exists for future extension.
 
-} // namespace nebula
+} // namespace painkiller

@@ -6,7 +6,7 @@
 #include "RenderTypes.h"
 #include <vector>
 
-namespace nebula {
+namespace painkiller {
 
 // ============================================================
 // Particle: Single particle for block break effects
@@ -52,4 +52,4 @@ private:
     bool m_initialized = false;
 };
 
-} // namespace nebula
+} // namespace painkiller

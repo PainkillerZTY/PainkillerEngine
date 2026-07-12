@@ -3,7 +3,7 @@
 #include "Types.h"
 #include <chrono>
 
-namespace nebula {
+namespace painkiller {
 
 // ?? Timer: High-precision frame timing ??
 class Timer {
@@ -36,4 +36,4 @@ private:
     static constexpr u32 kFPSUpdateInterval = 30; // Update FPS every N frames
 };
 
-} // namespace nebula
+} // namespace painkiller

@@ -6,7 +6,7 @@
 #include <fstream>
 #include <windows.h>
 
-namespace nebula {
+namespace painkiller {
 
 enum class LogLevel : u8 {
     Trace,
@@ -111,13 +111,13 @@ private:
     CRITICAL_SECTION m_criticalSection;
 };
 
-} // namespace nebula
+} // namespace painkiller
 
 // ?? Convenience Macros ??
-#define LOG_TRACE(...)   nebula::Logger::Instance().Trace(__FILE__, __LINE__, __VA_ARGS__)
-#define LOG_DEBUG(...)   nebula::Logger::Instance().Debug(__FILE__, __LINE__, __VA_ARGS__)
-#define LOG_INFO(...)    nebula::Logger::Instance().Info(__FILE__, __LINE__, __VA_ARGS__)
-#define LOG_WARN(...)    nebula::Logger::Instance().Warn(__FILE__, __LINE__, __VA_ARGS__)
-#define LOG_ERROR(...)   nebula::Logger::Instance().Error(__FILE__, __LINE__, __VA_ARGS__)
+#define LOG_TRACE(...)   painkiller::Logger::Instance().Trace(__FILE__, __LINE__, __VA_ARGS__)
+#define LOG_DEBUG(...)   painkiller::Logger::Instance().Debug(__FILE__, __LINE__, __VA_ARGS__)
+#define LOG_INFO(...)    painkiller::Logger::Instance().Info(__FILE__, __LINE__, __VA_ARGS__)
+#define LOG_WARN(...)    painkiller::Logger::Instance().Warn(__FILE__, __LINE__, __VA_ARGS__)
+#define LOG_ERROR(...)   painkiller::Logger::Instance().Error(__FILE__, __LINE__, __VA_ARGS__)
 
 

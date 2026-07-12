@@ -4,7 +4,7 @@
 #include "RenderTypes.h"
 #include <string>
 
-namespace nebula {
+namespace painkiller {
 
 struct Shader {
     ShaderStage stage;
@@ -15,4 +15,4 @@ struct Shader {
     virtual ~Shader() = default;
 };
 
-} // namespace nebula
+} // namespace painkiller

@@ -3,7 +3,7 @@
 #include "Component.h"
 #include "Vector.h"
 
-namespace nebula {
+namespace painkiller {
 
 // ?? Material Component ??
 struct MaterialComponent {
@@ -18,4 +18,4 @@ struct MaterialComponent {
     u32 roughnessTexture = kInvalidHandle;
 };
 
-} // namespace nebula
+} // namespace painkiller

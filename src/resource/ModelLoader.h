@@ -5,7 +5,7 @@
 #include "Renderer.h"
 #include <string>
 
-namespace nebula {
+namespace painkiller {
 
 class ModelLoader {
 public:
@@ -14,4 +14,4 @@ public:
     static MeshData LoadGLTF(const std::string& filepath);
 };
 
-} // namespace nebula
+} // namespace painkiller

@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <algorithm>
 
-namespace nebula {
+namespace painkiller {
 
 ParticleSystem::ParticleSystem() {}
 
@@ -147,4 +147,4 @@ void ParticleSystem::Render(Renderer* renderer) {
     }
 }
 
-} // namespace nebula
+} // namespace painkiller

@@ -5,7 +5,7 @@
 #include "Matrix.h"
 #include "Math.h"
 
-namespace nebula {
+namespace painkiller {
 
 // ?? Camera Component ??
 struct CameraComponent {
@@ -20,4 +20,4 @@ struct CameraComponent {
     }
 };
 
-} // namespace nebula
+} // namespace painkiller

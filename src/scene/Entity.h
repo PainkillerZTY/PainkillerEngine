@@ -4,7 +4,7 @@
 #include <string>
 #include <unordered_map>
 
-namespace nebula {
+namespace painkiller {
 
 class Entity {
 public:
@@ -36,4 +36,4 @@ private:
     u32 m_componentMask = 0;
 };
 
-} // namespace nebula
+} // namespace painkiller

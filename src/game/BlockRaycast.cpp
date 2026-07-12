@@ -3,7 +3,7 @@
 #include "Chunk.h"
 #include <cmath>
 
-namespace nebula {
+namespace painkiller {
 
 BlockType BlockRaycast::GetBlockAt(World* world, i32 x, i32 y, i32 z) {
     return world ? world->GetBlock(x, y, z) : BlockType::Air;
@@ -105,4 +105,4 @@ BlockRaycastResult BlockRaycast::Cast(const Vec3& origin, const Vec3& direction,
     return result;
 }
 
-} // namespace nebula
+} // namespace painkiller

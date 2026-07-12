@@ -1,11 +1,15 @@
-#include "Window.h"
-#include "Logger.h"
+ #include "Window.h"
+ #include "Logger.h"
+ 
+ // Raw Input function pointers (loaded at runtime for MinGW compat)
+ RegRawInputDevicesFn pfnRegisterRawInputDevices = nullptr;
+ GetRawInputDataFn pfnGetRawInputData = nullptr;
 
-namespace nebula {
+namespace painkiller {
 
 // ?? Window Class Registration ??
 static bool g_windowClassRegistered = false;
-static const char* kWindowClassName = "NebulaEngineWindow";
+ static const char* kWindowClassName = "PainkillerEngineWindow";
 
 bool Window::Initialize(u32 width, u32 height, const std::string& title) {
     m_width = width;
@@ -65,8 +69,27 @@ bool Window::Initialize(u32 width, u32 height, const std::string& title) {
     SetForegroundWindow(m_handle);
     SetFocus(m_handle);
     
-    LOG_INFO("Window created: {}x{} - {}", width, height, title);
-    return true;
+     LOG_INFO("Window created: {}x{} - {}", width, height, title);
+     
+     // Register raw input devices (mouse) for hardware-level deltas
+     MinGW_RAWINPUTDEVICE rid = {};
+     rid.usUsagePage = 0x01; // HID usage page: Generic Desktop Controls
+     rid.usUsage = 0x02;     // HID usage: Mouse
+     rid.dwFlags = 0;        // Receive input even when not in foreground
+     rid.hwndTarget = m_handle;
+     // Load Raw Input functions from user32.dll
+     if (!pfnRegisterRawInputDevices) {
+         HMODULE hUser32 = GetModuleHandleA("user32.dll");
+         if (hUser32) {
+             pfnRegisterRawInputDevices = (RegRawInputDevicesFn)GetProcAddress(hUser32, "RegisterRawInputDevices");
+             pfnGetRawInputData = (GetRawInputDataFn)GetProcAddress(hUser32, "GetRawInputData");
+         }
+     }
+     if (pfnRegisterRawInputDevices && !pfnRegisterRawInputDevices(&rid, 1, sizeof(rid))) {
+         LOG_WARN("Failed to register raw input device");
+     }
+     
+     return true;
 }
 
 void Window::Shutdown() {
@@ -102,31 +125,66 @@ LRESULT CALLBACK Window::WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
         window = (Window*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
     }
     
-    if (window) {
-        switch (msg) {
-            case WM_SIZE: {
-                u32 newWidth = LOWORD(lParam);
-                u32 newHeight = HIWORD(lParam);
-                window->m_width = newWidth;
-                window->m_height = newHeight;
-                if (window->m_resizeCallback) {
-                    window->m_resizeCallback(newWidth, newHeight);
-                }
-                return 0;
-            }
-            case WM_CLOSE:
-                window->m_open = false;
-                return 0;
-            case WM_DESTROY:
-                PostQuitMessage(0);
-                return 0;
+     if (!window) return DefWindowProc(hwnd, msg, wParam, lParam);
+     
+     // Forward input events to the engine via callback
+     switch (msg) {
+         case WM_KEYDOWN:
+         case WM_SYSKEYDOWN:
+         case WM_KEYUP:
+         case WM_SYSKEYUP:
+         case WM_MOUSEMOVE:
+         case WM_LBUTTONDOWN:
+         case WM_RBUTTONDOWN:
+         case WM_MBUTTONDOWN:
+         case WM_LBUTTONUP:
+         case WM_RBUTTONUP:
+         case WM_MBUTTONUP:
+     case WM_MOUSEWHEEL:
+         case WM_INPUT:
+             if (window->m_inputCallback)
+                 window->m_inputCallback(msg, wParam, lParam);
+             return 0;
+     }
+     
+     switch (msg) {
+         case WM_ACTIVATE: {
+             // Re-clip cursor when window gains focus for first-person view
+             if (LOWORD(wParam) != WA_INACTIVE) {
+                 RECT cr;
+                 GetClientRect(hwnd, &cr);
+                 MapWindowPoints(hwnd, nullptr, (POINT*)&cr, 2);
+                 ClipCursor(&cr);
+                 ShowCursor(FALSE);
+             } else {
+                 // Release cursor when window loses focus
+                 ClipCursor(nullptr);
+                 ShowCursor(TRUE);
+             }
+             return 0;
+         }
+         case WM_SIZE: {
+             u32 newWidth = LOWORD(lParam);
+             u32 newHeight = HIWORD(lParam);
+             window->m_width = newWidth;
+             window->m_height = newHeight;
+             if (window->m_resizeCallback) {
+                 window->m_resizeCallback(newWidth, newHeight);
+             }
+             return 0;
+         }
+         case WM_CLOSE:
+             window->m_open = false;
+             return 0;
+         case WM_DESTROY:
+             PostQuitMessage(0);
+             return 0;
         }
-    }
-    
-    return DefWindowProc(hwnd, msg, wParam, lParam);
+     
+     return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 
-} // namespace nebula
+} // namespace painkiller
 
 
 

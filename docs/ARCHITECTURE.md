@@ -1,4 +1,4 @@
-﻿# Nebula Engine v0.1.0
+# Painkiller Engine v0.1.0
 
 ## Architecture
 
@@ -36,7 +36,7 @@
 ## Directory Layout
 
 ```
-test3/
+GameEngine/
 +-- CMakeLists.txt          # Root build definition
 +-- src/
 |   +-- core/               # Types, Logger
@@ -116,7 +116,7 @@ damping, and alpha fading.
 ## Render Backend Interface
 
 The `Renderer` class is a pure virtual interface. To add a new backend:
-1. Create `D3D12Renderer.h/.cpp` that inherits from `Renderer`
+1. Create your Renderer that inherits from `Renderer`
 2. Implement all pure virtual methods
-3. Add to `Renderer::Create()` factory
+3. Add to the switch in Engine::Initialize()
 4. No changes needed in Scene, Engine, or Game

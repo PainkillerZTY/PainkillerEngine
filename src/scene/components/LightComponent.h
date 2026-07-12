@@ -3,7 +3,7 @@
 #include "Component.h"
 #include "RenderTypes.h"
 
-namespace nebula {
+namespace painkiller {
 
 // ?? Light Component ??
 struct LightComponent {
@@ -15,4 +15,4 @@ struct LightComponent {
     bool castsShadows   = false;
 };
 
-} // namespace nebula
+} // namespace painkiller

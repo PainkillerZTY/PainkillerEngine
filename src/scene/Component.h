@@ -3,7 +3,7 @@
 #include "Types.h"
 #include <string>
 
-namespace nebula {
+namespace painkiller {
 
 // ?? Base Component ??
 // Components are plain data structs.
@@ -21,4 +21,4 @@ enum class ComponentType : u8 {
     Count,
 };
 
-} // namespace nebula
+} // namespace painkiller

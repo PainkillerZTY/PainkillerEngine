@@ -2,7 +2,7 @@
 
 #include "Types.h"
 
-namespace nebula {
+namespace painkiller {
 
 // ============================================================
 // Simplex Noise Generator for terrain generation
@@ -33,4 +33,4 @@ private:
     std::array<i32, 512> m_perm;
 };
 
-} // namespace nebula
+} // namespace painkiller

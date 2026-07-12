@@ -1,6 +1,6 @@
-enable_testing()
-add_executable(nebula_tests
-    test_math.cpp
-)
-target_link_libraries(nebula_tests PRIVATE nebula_engine)
-add_test(NAME MathTests COMMAND nebula_tests)
+enable_testing()
+add_executable(painkiller_tests
+    test_math.cpp
+)
+target_link_libraries(painkiller_tests PRIVATE painkiller_engine)
+add_test(NAME MathTests COMMAND painkiller_tests)

@@ -1,8 +1,10 @@
 ﻿#include "Noise.h"
+#include "Math.h"
 #include <cmath>
 #include <algorithm>
+#include <cstdlib>
 
-namespace nebula {
+namespace painkiller {
 
 // Classic permutation table (from Ken Perlin)
 static const i32 kPerm[256] = {
@@ -25,24 +27,16 @@ static const i32 kPerm[256] = {
 };
 
 Noise::Noise(i32 seed) : m_seed(seed) {
-    // Build extended permutation table with seed-based shuffle
-    for (i32 i = 0; i < 256; ++i) {
-        m_perm[i] = kPerm[i];
-    }
-    // Simple shuffle using seed
+    for (i32 i = 0; i < 256; ++i) m_perm[i] = kPerm[i];
     std::srand((u32)m_seed);
     for (i32 i = 255; i > 0; --i) {
         i32 j = std::rand() % (i + 1);
         std::swap(m_perm[i], m_perm[j]);
     }
-    for (i32 i = 0; i < 256; ++i) {
-        m_perm[256 + i] = m_perm[i];
-    }
+    for (i32 i = 0; i < 256; ++i) m_perm[256 + i] = m_perm[i];
 }
 
-i32 Noise::FastFloor(f32 x) {
-    return (x > 0) ? (i32)x : (i32)x - 1;
-}
+i32 Noise::FastFloor(f32 x) { return (x > 0) ? (i32)x : (i32)x - 1; }
 
 f32 Noise::Grad(i32 hash, f32 x, f32 y, f32 z) {
     i32 h = hash & 15;
@@ -53,89 +47,55 @@ f32 Noise::Grad(i32 hash, f32 x, f32 y, f32 z) {
 
 f32 Noise::Grad2D(i32 hash, f32 x, f32 y) {
     i32 h = hash & 3;
-    f32 u = (h & 1) ? -x : x;
-    f32 v = (h & 2) ? -y : y;
-    return u + v;
+    return ((h & 1) ? -x : x) + ((h & 2) ? -y : y);
 }
 
 f32 Noise::Noise3D(f32 x, f32 y, f32 z) const {
     i32 X = FastFloor(x) & 255;
     i32 Y = FastFloor(y) & 255;
     i32 Z = FastFloor(z) & 255;
-
-    x -= floorf(x);
-    y -= floorf(y);
-    z -= floorf(z);
-
-    f32 u = x * x * x * (x * (x * 6.0f - 15.0f) + 10.0f);
-    f32 v = y * y * y * (y * (y * 6.0f - 15.0f) + 10.0f);
-    f32 w = z * z * z * (z * (z * 6.0f - 15.0f) + 10.0f);
-
-    i32 A  = m_perm[X] + Y;
-    i32 AA = m_perm[A] + Z;
-    i32 AB = m_perm[A + 1] + Z;
-    i32 B  = m_perm[X + 1] + Y;
-    i32 BA = m_perm[B] + Z;
-    i32 BB = m_perm[B + 1] + Z;
-
-    f32 x1 = Lerp(
-        Lerp(Lerp(Grad(m_perm[AA], x, y, z),     Grad(m_perm[BA], x-1, y, z),     u),
-             Lerp(Grad(m_perm[AB], x, y-1, z),   Grad(m_perm[BB], x-1, y-1, z),   u), v),
-        Lerp(Lerp(Grad(m_perm[AA+1], x, y, z-1), Grad(m_perm[BA+1], x-1, y, z-1), u),
-             Lerp(Grad(m_perm[AB+1], x, y-1, z-1), Grad(m_perm[BB+1], x-1, y-1, z-1), u), v), w);
-    return x1;
+    x -= floorf(x); y -= floorf(y); z -= floorf(z);
+    f32 u = x*x*x*(x*(x*6.0f-15.0f)+10.0f);
+    f32 v = y*y*y*(y*(y*6.0f-15.0f)+10.0f);
+    f32 w = z*z*z*(z*(z*6.0f-15.0f)+10.0f);
+    i32 A = m_perm[X]+Y, AA = m_perm[A]+Z, AB = m_perm[A+1]+Z;
+    i32 B = m_perm[X+1]+Y, BA = m_perm[B]+Z, BB = m_perm[B+1]+Z;
+    return Lerp(Lerp(Lerp(Grad(m_perm[AA],x,y,z), Grad(m_perm[BA],x-1,y,z), u),
+                     Lerp(Grad(m_perm[AB],x,y-1,z), Grad(m_perm[BB],x-1,y-1,z), u), v),
+                Lerp(Lerp(Grad(m_perm[AA+1],x,y,z-1), Grad(m_perm[BA+1],x-1,y,z-1), u),
+                     Lerp(Grad(m_perm[AB+1],x,y-1,z-1), Grad(m_perm[BB+1],x-1,y-1,z-1), u), v), w);
 }
 
 f32 Noise::Noise2D(f32 x, f32 y) const {
     i32 X = FastFloor(x) & 255;
     i32 Y = FastFloor(y) & 255;
-
-    x -= floorf(x);
-    y -= floorf(y);
-
-    f32 u = x * x * x * (x * (x * 6.0f - 15.0f) + 10.0f);
-    f32 v = y * y * y * (y * (y * 6.0f - 15.0f) + 10.0f);
-
-    i32 A = m_perm[X] + Y;
-    i32 B = m_perm[X + 1] + Y;
-
-    return Lerp(
-        Lerp(Grad2D(m_perm[A], x, y),     Grad2D(m_perm[B], x-1, y),     u),
-        Lerp(Grad2D(m_perm[A+1], x, y-1), Grad2D(m_perm[B+1], x-1, y-1), u), v);
+    x -= floorf(x); y -= floorf(y);
+    f32 u = x*x*x*(x*(x*6.0f-15.0f)+10.0f);
+    f32 v = y*y*y*(y*(y*6.0f-15.0f)+10.0f);
+    i32 A = m_perm[X]+Y;
+    i32 B = m_perm[X+1]+Y;
+    return Lerp(Lerp(Grad2D(m_perm[A],x,y), Grad2D(m_perm[B],x-1,y), u),
+                Lerp(Grad2D(m_perm[A+1],x,y-1), Grad2D(m_perm[B+1],x-1,y-1), u), v);
 }
 
 f32 Noise::FBM2D(f32 x, f32 y, i32 octaves, f32 lacunarity, f32 gain) const {
-    f32 value = 0.0f;
-    f32 amplitude = 1.0f;
-    f32 frequency = 1.0f;
-    f32 maxVal = 0.0f;
-
+    f32 value = 0.0f, amplitude = 1.0f, frequency = 1.0f, maxVal = 0.0f;
     for (i32 i = 0; i < octaves; ++i) {
         value += amplitude * Noise2D(x * frequency, y * frequency);
-        maxVal += amplitude;
-        amplitude *= gain;
-        frequency *= lacunarity;
+        maxVal += amplitude; amplitude *= gain; frequency *= lacunarity;
     }
     return value / maxVal;
 }
 
 f32 Noise::FBM3D(f32 x, f32 y, f32 z, i32 octaves, f32 lacunarity, f32 gain) const {
-    f32 value = 0.0f;
-    f32 amplitude = 1.0f;
-    f32 frequency = 1.0f;
-    f32 maxVal = 0.0f;
-
+    f32 value = 0.0f, amplitude = 1.0f, frequency = 1.0f, maxVal = 0.0f;
     for (i32 i = 0; i < octaves; ++i) {
         value += amplitude * Noise3D(x * frequency, y * frequency, z * frequency);
-        maxVal += amplitude;
-        amplitude *= gain;
-        frequency *= lacunarity;
+        maxVal += amplitude; amplitude *= gain; frequency *= lacunarity;
     }
     return value / maxVal;
 }
 
-f32 Noise::Normalize(f32 value) {
-    return (value + 1.0f) / 2.0f;
-}
+f32 Noise::Normalize(f32 value) { return (value + 1.0f) / 2.0f; }
 
-} // namespace nebula
+} // namespace painkiller

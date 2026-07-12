@@ -10,7 +10,7 @@
 #include <functional>
 #include <cassert>
 
-namespace nebula {
+namespace painkiller {
 
 // ?? Integer Types ??
 using i8  = int8_t;
@@ -65,4 +65,4 @@ enum class RenderBackend : u8 {
     Vulkan,
 };
 
-} // namespace nebula
+} // namespace painkiller

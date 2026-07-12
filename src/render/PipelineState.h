@@ -4,9 +4,9 @@
 #include "RenderTypes.h"
 #include "Renderer.h"
 
-namespace nebula {
+namespace painkiller {
 
 // PipelineState is managed through the Renderer interface;
 // this header defines helper types and utilities.
 
-} // namespace nebula
+} // namespace painkiller

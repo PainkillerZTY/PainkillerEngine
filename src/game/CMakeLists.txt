@@ -1,5 +1,5 @@
-﻿# ?? Game Module: Voxel Game (Minecraft-like) ??
-add_executable(nebula_game
+# Game Module: Voxel Game (Minecraft-like)
+add_executable(painkiller
     main.cpp
     Block.h Block.cpp
     Noise.h Noise.cpp
@@ -14,5 +14,5 @@ add_executable(nebula_game
     VoxelGame.h VoxelGame.cpp
 )
 
-target_include_directories(nebula_game PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(nebula_game PRIVATE nebula_engine)
+target_include_directories(painkiller PRIVATE $\{CMAKE_CURRENT_SOURCE_DIR\})
+target_link_libraries(painkiller PRIVATE painkiller_engine)

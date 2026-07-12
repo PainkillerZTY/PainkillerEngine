@@ -5,7 +5,7 @@
 #include "Noise.h"
 #include "Chunk.h"
 
-namespace nebula {
+namespace painkiller {
 
 // ============================================================
 // TerrainGenerator: Procedural world generation
@@ -50,4 +50,4 @@ private:
     u32 m_seed = 42;
 };
 
-} // namespace nebula
+} // namespace painkiller

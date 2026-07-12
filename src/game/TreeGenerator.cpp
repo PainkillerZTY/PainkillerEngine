@@ -3,7 +3,7 @@
 #include "Chunk.h"
 #include "Block.h"
 
-namespace nebula {
+namespace painkiller {
 
 void TreeGenerator::SetBlockAt(TerrainGenerator* terrain, Chunk* chunk,
                                 i32 chunkX, i32 chunkZ,
@@ -76,4 +76,4 @@ void TreeGenerator::PlaceTree(TerrainGenerator* terrain, Chunk* chunk,
     }
 }
 
-} // namespace nebula
+} // namespace painkiller

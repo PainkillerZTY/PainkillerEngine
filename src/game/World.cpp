@@ -1,9 +1,11 @@
 ﻿#include "World.h"
+#include <tuple>
+#include <cmath>
 #include "Chunk.h"
 #include "Logger.h"
 #include <algorithm>
 
-namespace nebula {
+namespace painkiller {
 
 World::World(Renderer* renderer)
     : m_renderer(renderer)
@@ -12,7 +14,8 @@ World::World(Renderer* renderer)
 
 World::~World() {
     // Clean up all chunk render data
-    for (auto& [pos, data] : m_chunkRenderData) {
+    for (auto& entry : m_chunkRenderData) {
+        ChunkRenderData& data = entry.second;
         if (data.meshHandle != kInvalidHandle && m_renderer) {
             m_renderer->DestroyMesh(data.meshHandle);
         }
@@ -99,7 +102,8 @@ void World::UpdateChunksAround(i32 centerBlockX, i32 centerBlockZ, i32 radius) {
     // Keep a slightly larger ring for hysteresis
     const i32 unloadRadius = radius + 2;
     std::vector<ChunkPos> toUnload;
-    for (auto& [pos, chunk] : m_chunks) {
+    for (auto& entry : m_chunks) {
+        ChunkPos pos = entry.first;
         i32 dx = pos.x - centerChunkX;
         i32 dz = pos.z - centerChunkZ;
         if (abs(dx) > unloadRadius || abs(dz) > unloadRadius) {
@@ -180,22 +184,130 @@ void World::UploadChunkMesh(Chunk* chunk) {
 // ============================================================
 // Rendering
 // ============================================================
-void World::Render(Renderer* renderer) {
+void World::Render(Renderer* renderer, const Frustum* frustum) {
     if (!renderer) return;
 
-    for (auto& [pos, data] : m_chunkRenderData) {
-        if (data.meshHandle != kInvalidHandle) {
-            renderer->DrawMesh(data.meshHandle);
+    for (auto& entry : m_chunkRenderData) {
+        const ChunkPos& pos = entry.first;
+        ChunkRenderData& data = entry.second;
+        if (data.meshHandle == kInvalidHandle) continue;
+        
+        // Frustum culling: check chunk AABB against frustum
+        if (frustum) {
+            Vec3 aabbMin((f32)(pos.x * CHUNK_SIZE_X), 0.0f, (f32)(pos.z * CHUNK_SIZE_Z));
+            Vec3 aabbMax((f32)((pos.x + 1) * CHUNK_SIZE_X), (f32)CHUNK_SIZE_Y, (f32)((pos.z + 1) * CHUNK_SIZE_Z));
+            if (!frustum->Intersects(aabbMin, aabbMax)) continue;
         }
+        
+        renderer->DrawMesh(data.meshHandle);
+    }
+}
+
+void World::SetBlocksBatch(const std::vector<std::tuple<i32,i32,i32,BlockType>>& blocks) {
+    // Group changes by chunk to batch mesh regeneration
+    std::unordered_map<ChunkPos, std::vector<std::tuple<i32,i32,i32,BlockType>>, ChunkPos::Hash> chunkChanges;
+    for (auto& t : blocks) {
+        i32 wx = std::get<0>(t), wy = std::get<1>(t), wz = std::get<2>(t);
+        if (wy < 0 || wy >= CHUNK_SIZE_Y) continue;
+        i32 cx, cz, lx, ly, lz;
+        WorldToChunkCoords(wx, wy, wz, cx, cz, lx, ly, lz);
+        auto it = m_chunks.find(ChunkPos(cx, cz));
+        if (it != m_chunks.end()) {
+            chunkChanges[ChunkPos(cx, cz)].push_back(t);
+        }
+    }
+    for (auto& entry : chunkChanges) {
+        Chunk* chunk = m_chunks[entry.first].get();
+        if (!chunk) continue;
+        for (auto& t : entry.second) {
+            i32 wx = std::get<0>(t), wy = std::get<1>(t), wz = std::get<2>(t);
+            i32 lx = wx - entry.first.x * CHUNK_SIZE_X;
+            i32 ly = wy;
+            i32 lz = wz - entry.first.z * CHUNK_SIZE_Z;
+            if (chunk->IsLocalCoordValid(lx, ly, lz))
+                chunk->SetBlock(lx, ly, lz, std::get<3>(t));
+        }
+        chunk->GenerateMesh(entry.first.x, entry.first.z);
+        UploadChunkMesh(chunk);
+    }
+}
+
+void World::UpdateWaterPhysics(f32 deltaTime, i32 centerX, i32 centerZ) {
+    m_waterTimer += deltaTime;
+    if (m_waterTimer < kWaterUpdateInterval) return;
+    m_waterTimer = 0.0f;
+    
+    i32 centerChunkX = (centerX >= 0) ? centerX / CHUNK_SIZE_X : (centerX + 1) / CHUNK_SIZE_X - 1;
+    i32 centerChunkZ = (centerZ >= 0) ? centerZ / CHUNK_SIZE_Z : (centerZ + 1) / CHUNK_SIZE_Z - 1;
+    
+    struct WaterMove { i32 x, y, z; BlockType blockType; };
+    std::vector<WaterMove> moves;
+    
+    // Process chunks near player for water physics
+    for (i32 dx = -3; dx <= 3; ++dx) {
+        for (i32 dz = -3; dz <= 3; ++dz) {
+            i32 cx = centerChunkX + dx;
+            i32 cz = centerChunkZ + dz;
+            auto it = m_chunks.find(ChunkPos(cx, cz));
+            if (it == m_chunks.end()) continue;
+            
+            i32 baseX = cx * CHUNK_SIZE_X;
+            i32 baseZ = cz * CHUNK_SIZE_Z;
+            
+            // Scan columns for water (near water level + below for falling water)
+            for (i32 y = std::min(55, CHUNK_SIZE_Y - 2); y >= 15; --y) {
+                for (i32 z = 0; z < CHUNK_SIZE_Z; ++z) {
+                    for (i32 x = 0; x < CHUNK_SIZE_X; ++x) {
+                        i32 wx = baseX + x;
+                        int wy = y;
+                        i32 wz = baseZ + z;
+                        
+                        BlockType block = GetBlock(wx, wy, wz);
+                        if (block != BlockType::Water) continue;
+                        
+                        // Flow downward
+                        if (wy > 0) {
+                            BlockType below = GetBlock(wx, wy - 1, wz);
+                            if (below == BlockType::Air) {
+                                moves.push_back({wx, wy - 1, wz, BlockType::Water});
+                                moves.push_back({wx, wy, wz, BlockType::Air});
+                                continue;
+                            }
+                        }
+                        
+                        // Flow horizontal
+                        bool flowed = false;
+                        static const int dirs[4][2] = {{1,0},{-1,0},{0,1},{0,-1}};
+                        for (int d = 0; d < 4 && !flowed; ++d) {
+                            i32 nx = wx + dirs[d][0];
+                            i32 nz = wz + dirs[d][1];
+                            BlockType adj = GetBlock(nx, wy, nz);
+                            if (adj == BlockType::Air) {
+                                moves.push_back({nx, wy, nz, BlockType::Water});
+                                moves.push_back({wx, wy, wz, BlockType::Air});
+                                flowed = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    // Batch apply all moves at once (single mesh regeneration per chunk)
+    if (!moves.empty()) {
+        std::vector<std::tuple<i32,i32,i32,BlockType>> batch;
+        for (auto& m : moves) {
+            batch.push_back(std::make_tuple(m.x, m.y, m.z, m.blockType));
+        }
+        SetBlocksBatch(batch);
     }
 }
 
 std::vector<Chunk*> World::GetAllChunks() {
     std::vector<Chunk*> result;
-    for (auto& [pos, chunk] : m_chunks) {
-        result.push_back(chunk.get());
-    }
+    for (auto& entry : m_chunks) { result.push_back(entry.second.get()); }
     return result;
 }
 
-} // namespace nebula
+} // namespace painkiller

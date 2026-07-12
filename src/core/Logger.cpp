@@ -3,7 +3,7 @@
 #include <iomanip>
 #include <windows.h>
 
-namespace nebula {
+namespace painkiller {
 
 Logger& Logger::Instance() {
     static Logger instance;
@@ -88,4 +88,4 @@ void Logger::Log(LogLevel level, const char* file, i32 line, const std::string& 
     }
 }
 
-} // namespace nebula
+} // namespace painkiller

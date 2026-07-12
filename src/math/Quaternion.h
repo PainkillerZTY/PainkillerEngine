@@ -3,7 +3,7 @@
 #include "Vector.h"
 #include <glm/gtc/quaternion.hpp>
 
-namespace nebula {
+namespace painkiller {
 
 // Quat is defined in Vector.h as glm::quat
 
@@ -29,4 +29,4 @@ inline Quat Slerp(const Quat& a, const Quat& b, f32 t) {
 
 inline Mat4 ToMat4(const Quat& q) { return glm::mat4_cast(q); }
 
-} // namespace nebula
+} // namespace painkiller

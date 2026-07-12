@@ -16,7 +16,7 @@
 #include <string>
 #include <unordered_map>
 
-namespace nebula {
+namespace painkiller {
 
 // ?? Scene: Container for entities and their components ??
 class Scene {
@@ -78,5 +78,5 @@ private:
     EntityID m_nextEntityID = 0;
 };
 
-} // namespace nebula
+} // namespace painkiller
 

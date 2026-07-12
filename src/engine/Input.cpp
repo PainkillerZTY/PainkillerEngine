@@ -1,14 +1,16 @@
 #include "Input.h"
 
-namespace nebula {
+namespace painkiller {
 
-void Input::BeginFrame() {
-    m_prevKeys = m_keys;
-    m_prevMouseButtons = m_mouseButtons;
-    m_mouseDeltaX = 0;
-    m_mouseDeltaY = 0;
-    m_scrollDelta = 0;
-}
+ void Input::BeginFrame() {
+     m_prevKeys = m_keys;
+     m_prevMouseButtons = m_mouseButtons;
+     m_mouseDeltaX = 0;
+     m_mouseDeltaY = 0;
+     m_rawDeltaX = 0;
+     m_rawDeltaY = 0;
+     m_scrollDelta = 0;
+ }
 
 void Input::OnKeyDown(u32 key) {
     if (key < kMaxKeys) m_keys[key] = true;
@@ -37,4 +39,4 @@ void Input::OnScroll(i32 delta) {
     m_scrollDelta = delta;
 }
 
-} // namespace nebula
+} // namespace painkiller

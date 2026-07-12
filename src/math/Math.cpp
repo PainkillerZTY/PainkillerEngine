@@ -3,6 +3,6 @@
  // missing source files.
  #include "Math.h"
  
- namespace nebula {
+ namespace painkiller {
      // Intentionally empty — all math is inline/header-only.
  }

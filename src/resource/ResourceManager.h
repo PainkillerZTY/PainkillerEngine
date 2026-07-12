@@ -6,7 +6,7 @@
 #include <unordered_map>
 #include <memory>
 
-namespace nebula {
+namespace painkiller {
 
 // ?? Resource Manager ??
 // Handles loading, caching, and lifetime of game resources.
@@ -47,4 +47,4 @@ private:
     std::unordered_map<std::string, TextureHandle> m_textureCache;
 };
 
-} // namespace nebula
+} // namespace painkiller

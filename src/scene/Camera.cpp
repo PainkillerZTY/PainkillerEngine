@@ -1,7 +1,8 @@
-#include "Camera.h"
-#include "Math.h"
+ #include "Camera.h"
+ #include "Math.h"
+ #include <cmath>
 
-namespace nebula {
+namespace painkiller {
 
 void Camera::RecalculateView() {
     Quat rot = Quat(glm::radians(m_euler));
@@ -26,4 +27,14 @@ Vec3 Camera::GetRight() const {
     return glm::normalize(rot * Vec3(1.0f, 0.0f, 0.0f));
 }
 
-} // namespace nebula
+ 
+ void Camera::UpdateFOV(f32 deltaTime) {
+     if (std::abs(m_fov - m_targetFOV) < 0.01f) {
+         m_fov = m_targetFOV;
+         return;
+     }
+     m_fov += (m_targetFOV - m_fov) * std::min(1.0f, 8.0f * deltaTime);
+     m_projectionDirty = true;
+ }
+ 
+ } // namespace painkiller

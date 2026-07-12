@@ -1,6 +1,6 @@
 #include "Timer.h"
 
-namespace nebula {
+namespace painkiller {
 
 Timer::Timer() {
     m_startTime = std::chrono::high_resolution_clock::now();
@@ -48,4 +48,4 @@ f64 Timer::GetTimeSinceStart() const {
     return elapsed.count();
 }
 
-} // namespace nebula
+} // namespace painkiller

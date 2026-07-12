@@ -2,7 +2,7 @@
 
 #include "Vector.h"
 
-namespace nebula {
+namespace painkiller {
 
 // ?? Perspective / View Matrix Helpers ??
 inline Mat4 Perspective(f32 fovY, f32 aspect, f32 nearZ, f32 farZ) {
@@ -47,4 +47,4 @@ inline Mat3 Mat3Identity() { return Mat3(1.0f); }
 inline Mat4 Transpose(const Mat4& m) { return glm::transpose(m); }
 inline Mat4 Inverse(const Mat4& m) { return glm::inverse(m); }
 
-} // namespace nebula
+} // namespace painkiller

@@ -1,6 +1,6 @@
 #include "Renderer.h"
 
-namespace nebula {
+namespace painkiller {
 
 // ?? Factory ??
 Renderer* Renderer::Create(RenderBackend backend) {
@@ -16,4 +16,4 @@ Renderer* Renderer::Create(RenderBackend backend) {
     return nullptr; // Concrete implementation creates via static method
 }
 
-} // namespace nebula
+} // namespace painkiller

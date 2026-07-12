@@ -5,7 +5,7 @@
 #include "Renderer.h"
 #include <string>
 
-namespace nebula {
+namespace painkiller {
 
 class TextureLoader {
 public:
@@ -13,4 +13,4 @@ public:
     static void FreeLoadedData(u8* data);
 };
 
-} // namespace nebula
+} // namespace painkiller

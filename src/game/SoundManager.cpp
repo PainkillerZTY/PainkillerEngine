@@ -1,7 +1,7 @@
 ﻿#include "SoundManager.h"
 #include "Logger.h"
 
-namespace nebula {
+namespace painkiller {
 
 SoundManager::SoundManager() {}
 
@@ -36,4 +36,4 @@ void SoundManager::PlayClick() {
     Beep(800, 20);
 }
 
-} // namespace nebula
+} // namespace painkiller

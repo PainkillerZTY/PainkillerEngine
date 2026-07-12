@@ -2,7 +2,7 @@
 
 #include "Engine.h"
 
-namespace nebula {
+namespace painkiller {
 
 // ?? Demo Application ??
 class DemoApp {
@@ -41,4 +41,4 @@ private:
     f32 m_cameraHeight = 2.0f;
 };
 
-} // namespace nebula
+} // namespace painkiller

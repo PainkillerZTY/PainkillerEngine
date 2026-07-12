@@ -1,4 +1,4 @@
-# NEBULA Engine - Dependencies Setup Script
+# PAINKILLER Engine - Dependencies Setup Script
 # Downloads and builds third-party libraries
 
 $Root = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
@@ -9,7 +9,7 @@ $BuildDir = Join-Path $Root "build_deps"
 New-Item -ItemType Directory -Force -Path $ThirdParty | Out-Null
 New-Item -ItemType Directory -Force -Path $BuildDir | Out-Null
 
-Write-Host "=== NEBULA Engine Dependency Setup ===" -ForegroundColor Cyan
+Write-Host "=== PAINKILLER Engine Dependency Setup ===" -ForegroundColor Cyan
 
 # ?? 1. GLM (header-only math library) ??
 $GLM_Version = "1.0.0"

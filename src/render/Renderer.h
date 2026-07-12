@@ -6,7 +6,7 @@
 #include "Matrix.h"
 #include <memory>
 
-namespace nebula {
+namespace painkiller {
 
 using ShaderHandle = Handle;
 using BufferHandle = Handle;
@@ -63,4 +63,4 @@ public:
     static Renderer* Create(RenderBackend backend = RenderBackend::OpenGL);
 };
 
-} // namespace nebula
+} // namespace painkiller

@@ -4,7 +4,7 @@
 #include "Block.h"
 #include "Chunk.h"
 
-namespace nebula {
+namespace painkiller {
 
 class TerrainGenerator; // Forward declaration
 
@@ -28,4 +28,4 @@ private:
                     BlockType type);
 };
 
-} // namespace nebula
+} // namespace painkiller

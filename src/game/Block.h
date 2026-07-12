@@ -4,7 +4,7 @@
 #include "Vector.h"
 #include <array>
 
-namespace nebula {
+namespace painkiller {
 
 // ============================================================
 // Block Types
@@ -86,19 +86,19 @@ using WorldBlockPos = BlockCoord;
 // Pre-defined block colors (simple palette for MVP)
 // ============================================================
 namespace BlockColors {
-    constexpr Vec3 GrassTop     = Vec3(0.29f, 0.65f, 0.14f);
-    constexpr Vec3 GrassSide    = Vec3(0.27f, 0.50f, 0.12f);
-    constexpr Vec3 Dirt         = Vec3(0.45f, 0.32f, 0.18f);
-    constexpr Vec3 Stone        = Vec3(0.50f, 0.50f, 0.50f);
-    constexpr Vec3 Cobblestone  = Vec3(0.40f, 0.40f, 0.40f);
-    constexpr Vec3 OakLogSide   = Vec3(0.42f, 0.29f, 0.13f);
-    constexpr Vec3 OakLogTop    = Vec3(0.55f, 0.37f, 0.16f);
-    constexpr Vec3 Leaves       = Vec3(0.15f, 0.50f, 0.08f);
-    constexpr Vec3 Planks       = Vec3(0.52f, 0.36f, 0.18f);
-    constexpr Vec3 Sand         = Vec3(0.76f, 0.70f, 0.50f);
-    constexpr Vec3 Water        = Vec3(0.20f, 0.40f, 0.80f);
-    constexpr Vec3 Snow         = Vec3(0.95f, 0.95f, 0.98f);
-    constexpr Vec3 Bedrock      = Vec3(0.20f, 0.20f, 0.20f);
+    const Vec3 GrassTop     = Vec3(0.29f, 0.65f, 0.14f);
+    const Vec3 GrassSide    = Vec3(0.27f, 0.50f, 0.12f);
+    const Vec3 Dirt         = Vec3(0.45f, 0.32f, 0.18f);
+    const Vec3 Stone        = Vec3(0.50f, 0.50f, 0.50f);
+    const Vec3 Cobblestone  = Vec3(0.40f, 0.40f, 0.40f);
+    const Vec3 OakLogSide   = Vec3(0.42f, 0.29f, 0.13f);
+    const Vec3 OakLogTop    = Vec3(0.55f, 0.37f, 0.16f);
+    const Vec3 Leaves       = Vec3(0.15f, 0.50f, 0.08f);
+    const Vec3 Planks       = Vec3(0.52f, 0.36f, 0.18f);
+    const Vec3 Sand         = Vec3(0.76f, 0.70f, 0.50f);
+    const Vec3 Water        = Vec3(0.20f, 0.40f, 0.80f);
+    const Vec3 Snow         = Vec3(0.95f, 0.95f, 0.98f);
+    const Vec3 Bedrock      = Vec3(0.20f, 0.20f, 0.20f);
 }
 
-} // namespace nebula
+} // namespace painkiller

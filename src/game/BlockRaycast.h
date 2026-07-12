@@ -4,7 +4,7 @@
 #include "Vector.h"
 #include "Block.h"
 
-namespace nebula {
+namespace painkiller {
 
 class World; // Forward declaration
 
@@ -36,4 +36,4 @@ private:
     static BlockType GetBlockAt(World* world, i32 x, i32 y, i32 z);
 };
 
-} // namespace nebula
+} // namespace painkiller

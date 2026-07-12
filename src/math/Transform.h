@@ -4,7 +4,7 @@
 #include "Matrix.h"
 #include "Quaternion.h"
 
-namespace nebula {
+namespace painkiller {
 
 struct Transform {
     Vec3 position = Vec3(0.0f);
@@ -36,4 +36,4 @@ inline Transform TransformIdentity() {
     return Transform{};
 }
 
-} // namespace nebula
+} // namespace painkiller
