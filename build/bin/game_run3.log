@@ -1,0 +1,11 @@
+[15:20:12][INFO](G:/AI_projects/GameEngine/src/engine/Engine.cpp:10) Nebula Engine v0.1.0 initializing...
+[15:20:12][INFO](G:/AI_projects/GameEngine/src/engine/Window.cpp:68) Window created: 1280x720 - Nebula Engine - Minecraft-Like Demo
+[15:20:12][INFO](G:/AI_projects/GameEngine/src/render/OpenGLRenderer.cpp:152) Initializing OpenGL 3.3 Core...
+[15:20:13][INFO](G:/AI_projects/GameEngine/src/render/OpenGLRenderer.cpp:172) OpenGL: 3.3.0 - Build 32.0.101.7082
+[15:20:13][INFO](G:/AI_projects/GameEngine/src/game/VoxelGame.cpp:112) VoxelGame initializing...
+[15:20:13][INFO](G:/AI_projects/GameEngine/src/game/World.cpp:29) World initialized with seed: 42
+[15:20:13][INFO](G:/AI_projects/GameEngine/src/game/ParticleSystem.cpp:90) ParticleSystem initialized
+[15:20:13][INFO](G:/AI_projects/GameEngine/src/game/SoundManager.cpp:14) SoundManager initialized (using Beep API)
+[15:20:14][INFO](G:/AI_projects/GameEngine/src/game/VoxelGame.cpp:165) VoxelGame initialized
+[15:20:14][INFO](G:/AI_projects/GameEngine/src/engine/Engine.cpp:57) Nebula Engine initialized successfully
+[15:20:14][INFO](G:/AI_projects/GameEngine/src/engine/Engine.cpp:95) Engine entering main loop
