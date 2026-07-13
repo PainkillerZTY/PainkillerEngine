@@ -102,6 +102,9 @@ public:
 
     // Get all loaded chunks
     std::vector<Chunk*> GetAllChunks();
+    // Save/Load world to binary file
+    bool SaveWorld(const char* path);
+    bool LoadWorld(const char* path);
 
 private:
     // Build mesh for a chunk and upload to GPU

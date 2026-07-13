@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <algorithm>
 #include <cstdio>
+#include <direct.h>
 #include <cmath>
 
 namespace painkiller {
@@ -221,8 +222,13 @@ bool VoxelGame::Initialize(Engine* engine) {
     // 5. Sound
     m_soundManager.Initialize();
 
-    // 6. Load initial chunks
-    UpdateChunks(engine);
+    // 6. Load initial chunks (try save file first)
+    if (!m_world->LoadWorld("saves/world.sav")) {
+        UpdateChunks(engine);
+        LOG_INFO("No save found, generating new world");
+    } else {
+        LOG_INFO("World loaded from save");
+    }
 
                         
 // 7. Generate procedural textures
@@ -891,6 +897,11 @@ void VoxelGame::RenderBlockHighlight(Renderer* renderer, Camera* camera) {
     renderer->DrawMesh(m_wireframeCubeMesh);
 }
 void VoxelGame::Shutdown(Engine* engine) {
+    // Save world to disk
+    if (m_world) {
+        _mkdir("saves");
+        m_world->SaveWorld("saves/world.sav");
+    }
     if (!m_initialized) return;
     m_initialized = false;
     LOG_INFO("VoxelGame shutting down...");

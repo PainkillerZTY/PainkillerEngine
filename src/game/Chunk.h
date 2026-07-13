@@ -69,6 +69,9 @@ public:
 
     // Has geometry?
     bool HasMesh() const { return m_hasMesh; }
+    // Raw block data access for save/load
+    const u8* GetRawBlockData() const { return reinterpret_cast<const u8*>(m_blocks.data()); }
+    void SetRawBlockData(const u8* data) { memcpy(m_blocks.data(), data, CHUNK_VOLUME); }
 
 private:
     // Convert local coords to flat index

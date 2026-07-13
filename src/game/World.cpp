@@ -1,4 +1,6 @@
 #include "World.h"
+#include <cstdio>
+#include <cstring>
 #include <tuple>
 #include <cmath>
 #include "Chunk.h"
@@ -300,6 +302,36 @@ void World::UpdateWaterPhysics(f32 deltaTime, i32 centerX, i32 centerZ) {
     }
 }
 
+bool World::SaveWorld(const char* path) {
+    FILE* f = fopen(path, "wb");
+    if (!f) return false;
+    u32 magic = 0x4E494150; u32 version = 1; u32 seed = m_seed;
+    fwrite(&magic,4,1,f); fwrite(&version,4,1,f); fwrite(&seed,4,1,f);
+    auto chunks = GetAllChunks(); u32 n = (u32)chunks.size(); fwrite(&n,4,1,f);
+    for (auto* c : chunks) {
+        i32 cx=c->GetChunkX(), cz=c->GetChunkZ();
+        fwrite(&cx,4,1,f); fwrite(&cz,4,1,f);
+        fwrite(c->GetRawBlockData(),1,CHUNK_VOLUME,f);
+    }
+    fclose(f); LOG_INFO("World saved: {} chunks", n); return true;
+}
+bool World::LoadWorld(const char* path) {
+    FILE* f = fopen(path, "rb");
+    if (!f) return false;
+    u32 magic,version,seed,n; fread(&magic,4,1,f);
+    if (magic != 0x4E494150) { fclose(f); return false; }
+    fread(&version,4,1,f); fread(&seed,4,1,f); m_seed=seed; m_terrainGen.SetSeed(seed);
+    fread(&n,4,1,f);
+    for (u32 i=0;i<n;i++) {
+        i32 cx,cz; fread(&cx,4,1,f); fread(&cz,4,1,f);
+        auto ch=std::make_unique<Chunk>(cx,cz);
+        std::vector<u8> d(CHUNK_VOLUME); fread(d.data(),1,CHUNK_VOLUME,f);
+        ch->SetRawBlockData(d.data()); ch->GenerateMesh(cx,cz);
+        ChunkPos p(cx,cz); Chunk* ptr=ch.get();
+        m_chunks[p]=std::move(ch); UploadChunkMesh(ptr);
+    }
+    fclose(f); LOG_INFO("World loaded: {} chunks", n); return true;
+}
 std::vector<Chunk*> World::GetAllChunks() {
     std::vector<Chunk*> result;
     for (auto& entry : m_chunks) { result.push_back(entry.second.get()); }
