@@ -574,6 +574,7 @@ void VoxelGame::Update(Engine* engine, f32 deltaTime) {
     if (!m_initialized) return;
      m_gameTime += deltaTime;
      UpdateChunks(engine);
+     m_world->ProcessChunkLoadQueue();
      HandleBlockInteraction(engine, deltaTime);
      m_player.Update(engine, deltaTime);
      // Update water physics

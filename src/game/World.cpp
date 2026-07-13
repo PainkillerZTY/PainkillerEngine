@@ -95,7 +95,8 @@ void World::UpdateChunksAround(i32 centerBlockX, i32 centerBlockZ, i32 radius) {
             i32 cx = centerChunkX + dx;
             i32 cz = centerChunkZ + dz;
             if (!IsChunkLoaded(cx, cz)) {
-                LoadChunk(cx, cz);
+                bool q=false; for(auto& qp:m_pendingLoadQueue){if(qp.x==cx&&qp.z==cz){q=true;break;}}
+                if(!q) m_pendingLoadQueue.push_back(ChunkPos(cx,cz));
             }
         }
     }
@@ -331,6 +332,14 @@ bool World::LoadWorld(const char* path) {
         m_chunks[p]=std::move(ch); UploadChunkMesh(ptr);
     }
     fclose(f); LOG_INFO("World loaded: {} chunks", n); return true;
+}
+void World::ProcessChunkLoadQueue() {
+    if(m_pendingLoadQueue.empty()) return;
+    // Process up to 2 chunks per frame for faster loading
+    for(int i=0;i<2&&!m_pendingLoadQueue.empty();i++){
+        ChunkPos pos=m_pendingLoadQueue.back(); m_pendingLoadQueue.pop_back();
+        if(!IsChunkLoaded(pos.x,pos.z)) LoadChunk(pos.x,pos.z);
+    }
 }
 std::vector<Chunk*> World::GetAllChunks() {
     std::vector<Chunk*> result;

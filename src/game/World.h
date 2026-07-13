@@ -81,6 +81,7 @@ public:
 
     // Ensure chunks around a position are loaded
     void UpdateChunksAround(i32 centerBlockX, i32 centerBlockZ, i32 radius = 6);
+    void ProcessChunkLoadQueue();
 
     // Block get/set across chunk boundaries
     BlockType GetBlock(i32 worldX, i32 worldY, i32 worldZ) const;
@@ -114,6 +115,7 @@ private:
     std::unordered_map<ChunkPos, std::unique_ptr<Chunk>, ChunkPos::Hash> m_chunks;
     f32 m_waterTimer = 0.0f;
     static constexpr f32 kWaterUpdateInterval = 0.25f;
+    std::vector<ChunkPos> m_pendingLoadQueue;
 
     // Render resources per chunk (mesh handles)
     struct ChunkRenderData {
