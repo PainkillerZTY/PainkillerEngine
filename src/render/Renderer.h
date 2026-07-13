@@ -1,3 +1,10 @@
+// ============================================================
+// Renderer.h — Abstract GPU API interface
+//
+// Pure virtual base class for backend-specific renderers.
+// Handles: shaders, buffers, textures, pipelines, meshes.
+// Uniform setting by name. Draw calls via Draw/DrawIndexed/DrawMesh.
+// ============================================================
 #pragma once
 
 #include "Types.h"

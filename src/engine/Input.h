@@ -1,3 +1,10 @@
+// ============================================================
+// Input.h — Keyboard + mouse input manager
+//
+// Tracks 256 keyboard keys, 8 mouse buttons per frame.
+// Supports raw mouse deltas (WM_INPUT) for FPS controls.
+// BeginFrame() copies current state to previous for edge detection.
+// ============================================================
 #pragma once
 
 #include "Types.h"

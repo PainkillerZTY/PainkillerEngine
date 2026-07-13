@@ -1,3 +1,12 @@
+// ============================================================
+// World.h — Voxel world manager
+//
+// Manages Chunk objects keyed by ChunkPos (x,z).
+// Handles dynamic loading/unloading, block I/O across chunks,
+//   frustum culling, and water physics simulation.
+//
+// Key methods: GetBlock/SetBlock, UpdateChunksAround, Render
+// ============================================================
 ﻿#pragma once
 
 #include "Types.h"

@@ -1,3 +1,10 @@
+// ============================================================
+// Engine.h — Core game loop orchestrator
+//
+// Creates Window + Renderer + Input + Scene.
+// Runs main loop: Input → Update → Render → Present.
+// Lifecycle callbacks for game-specific initialization.
+// ============================================================
 #pragma once
 
 #include "Types.h"

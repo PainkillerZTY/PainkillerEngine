@@ -1,38 +1,64 @@
-# Painkiller Engine v0.1.0 �� Roadmap
+# Development Roadmap
 
-## Completed (v0.1.0)
-- [x] Engine core: Window, Input, Timer, main loop
-- [x] OpenGL 3.3 renderer with shader/pipeline abstraction
-- [x] Procedural voxel world with chunk-based meshing
-- [x] Multi-biome terrain generation (Plains, Forest, Desert, Snowy, Ocean)
-- [x] First-person player controls (WASD + mouse look + jump)
-- [x] Block raycasting (DDA) for placement/breaking
-- [x] Block break particles
-- [x] Basic sound effects (Win32 Beep API)
-- [x] Distance fog for atmosphere
-- [x] Crosshair UI
+## Phase 1: Core Engine (Complete)
+- [x] OpenGL 3.3 Core renderer
+- [x] Win32 window + raw input
+- [x] Entity-component scene
+- [x] GLM math library
+- [x] stb_image texture loading
+- [x] CMake + Ninja build
 
-## Short-term
-- [ ] Hotbar / block selection UI
-- [ ] Inventory system
-- [ ] Day/night cycle with skybox
-- [ ] More block types (glass, brick, etc.)
-- [ ] Block crafting recipes
-- [ ] Water animation
-- [ ] Save/load world to disk
+## Phase 2: Voxel World (Complete)
+- [x] Chunk-based world (16×128×16)
+- [x] Simplex noise terrain (4 biomes)
+- [x] 3D noise caves
+- [x] Oak tree generation
+- [x] Face culling + frustum culling
+- [x] AABB collision
+- [x] DDA block raycasting
 
-## Medium-term
-- [ ] Better sound system (WAV/MP3 playback)
-- [ ] Frustum culling for chunks
-- [ ] Multithreaded chunk generation
-- [ ] Smooth player lighting / block light
-- [ ] Item drops on block break
-- [ ] Mipmapping / texture arrays
-- [ ] Config system (keybindings, settings)
+## Phase 3: Gameplay (Partial)
+- [x] Block breaking (instant)
+- [x] Block placing (right-click)
+- [x] Hotbar (9 slots)
+- [x] Water flow simulation
+- [x] First-person held block
+- [x] Procedural gradient skybox
+- [ ] Block breaking with timer/delay
+- [ ] Block targeting highlight
+- [x] Procedural textures (smooth noise)
+- [x] Particle effects
+- [x] Sound effects (Win32 Beep)
 
-## Long-term
-- [ ] Multiplayer support (client/server)
-- [ ] Entity system (mobs, animals)
-- [ ] Advanced physics engine
-- [ ] Modding API
-- [ ] Cross-platform (Linux, macOS)
+## Phase 4: Advanced Rendering (Planned)
+- [ ] **Instanced rendering** — Merge all chunks into single draw call per texture
+  - Reference: CreationEngine's CubeModel with glDrawElementsInstanced
+  - Benefit: Reduces draw calls from 81+ to 10 (one per texture)
+  - Required: Instance attribute (per-instance matrix), batch collection per frame
+
+- [ ] **Player model** — First/third-person character
+  - Vertex data from PersonVertexData.h (head, body, arms, legs)
+  - Walking animation with limb swinging
+  - First-person arm with held block
+
+- [ ] **LOD system** — Level-of-detail for distant chunks
+  - 4×4×4 block merging at distance
+  - Reduced vertex count for far-away chunks
+
+- [ ] **Skybox with textures** — Cubemap from 6 JPG faces
+  - Load right/left/top/bottom/front/back sky JPGs
+  - GL_TEXTURE_CUBE_MAP with samplerCube
+
+## Phase 5: Performance (Planned)
+- [ ] **Multi-threaded terrain generation**
+  - Thread pool for chunk generation
+  - Queue-based system with priority (nearest chunks first)
+- [ ] **Save/Load world**
+  - Block serialization to disk (region-based files)
+  - Chunk compression (zlib/lz4)
+- [ ] **Profiling** — Frame timing, draw call count, memory usage
+
+## Phase 6: Multiplayer (Long-term)
+- [ ] Client-server architecture
+- [ ] State synchronization
+- [ ] Player entities for other players

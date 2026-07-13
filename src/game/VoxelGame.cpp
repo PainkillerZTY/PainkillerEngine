@@ -87,12 +87,12 @@ static const char* kWorldFragmentSrc = R"(
     // Compute face-local UV from fragment world position
     vec2 getFaceUV(vec3 pos, int f) {
         vec3 l = fract(pos);
-        if (f == 0) return vec2(1.0 - l.z, 1.0 - l.y);   // +X Right
-        else if (f == 1) return vec2(l.z, 1.0 - l.y);     // -X Left
+        if (f == 0) return vec2(1.0 - l.z, l.y);       // +X Right
+        else if (f == 1) return vec2(l.z, l.y);         // -X Left
         else if (f == 2) return vec2(l.x, 1.0 - l.z);     // +Y Top
         else if (f == 3) return vec2(l.x, l.z);            // -Y Bottom
-        else if (f == 4) return vec2(1.0 - l.x, 1.0 - l.y); // +Z Front
-        else return vec2(l.x, 1.0 - l.y);                   // -Z Back
+        else if (f == 4) return vec2(1.0 - l.x, l.y);    // +Z Front
+        else return vec2(l.x, l.y);                      // -Z Back
     }
 
     // Water animation wave

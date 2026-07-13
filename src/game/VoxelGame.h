@@ -1,3 +1,12 @@
+// ============================================================
+// VoxelGame.h — Main game orchestrator
+//
+// Top-level game class registered as Engine callbacks.
+// Coordinates: World (chunks/terrain), PlayerController,
+//   ParticleSystem, SoundManager, all rendering pipelines.
+//
+// Lifecycle: Initialize() -> Update()/Render() loop -> Shutdown()
+// ============================================================
 ﻿#pragma once
 
 #include "Engine.h"
