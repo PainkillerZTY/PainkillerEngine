@@ -1,4 +1,4 @@
-﻿#include "World.h"
+#include "World.h"
 #include <tuple>
 #include <cmath>
 #include "Chunk.h"
@@ -294,13 +294,9 @@ void World::UpdateWaterPhysics(f32 deltaTime, i32 centerX, i32 centerZ) {
         }
     }
     
-    // Batch apply all moves at once (single mesh regeneration per chunk)
-    if (!moves.empty()) {
-        std::vector<std::tuple<i32,i32,i32,BlockType>> batch;
-        for (auto& m : moves) {
-            batch.push_back(std::make_tuple(m.x, m.y, m.z, m.blockType));
-        }
-        SetBlocksBatch(batch);
+    // Apply all water moves directly
+    for (auto& m : moves) {
+        SetBlock(m.x, m.y, m.z, m.blockType);
     }
 }
 

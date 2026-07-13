@@ -1,4 +1,4 @@
-﻿#include "Block.h"
+#include "Block.h"
 
 namespace painkiller {
 

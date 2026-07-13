@@ -1,4 +1,4 @@
-﻿#include "TreeGenerator.h"
+#include "TreeGenerator.h"
 #include "TerrainGenerator.h"
 #include "Chunk.h"
 #include "Block.h"

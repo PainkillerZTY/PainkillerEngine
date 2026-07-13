@@ -1,4 +1,4 @@
-﻿#include "Engine.h"
+#include "Engine.h"
 #include "VoxelGame.h"
 #include "Logger.h"
 #include <cstdlib>

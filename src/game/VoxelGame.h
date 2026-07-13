@@ -7,7 +7,7 @@
 //
 // Lifecycle: Initialize() -> Update()/Render() loop -> Shutdown()
 // ============================================================
-﻿#pragma once
+#pragma once
 
 #include "Engine.h"
 #include "Camera.h"
@@ -34,7 +34,7 @@ public:
     void Shutdown(Engine* engine);
 
 private:
-    void HandleBlockInteraction(Engine* engine);
+    void HandleBlockInteraction(Engine* engine, f32 deltaTime);
     void UpdateChunks(Engine* engine);
     void SetupShadersAndPipeline(Renderer* renderer);
     void RenderWorld(Renderer* renderer, Camera* camera);

@@ -1,4 +1,4 @@
-﻿#include "TerrainGenerator.h"
+#include "TerrainGenerator.h"
 #include <tuple>
 #include "TreeGenerator.h"
 #include <cmath>

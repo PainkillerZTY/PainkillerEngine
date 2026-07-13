@@ -1,4 +1,4 @@
-﻿#include "BlockRaycast.h"
+#include "BlockRaycast.h"
 #include "World.h"
 #include "Chunk.h"
 #include <cmath>

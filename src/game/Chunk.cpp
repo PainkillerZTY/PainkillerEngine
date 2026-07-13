@@ -1,4 +1,4 @@
-﻿#include "Chunk.h"
+#include "Chunk.h"
 #include "Logger.h"
 #include <cstring>
 

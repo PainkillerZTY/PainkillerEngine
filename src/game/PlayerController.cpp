@@ -1,4 +1,4 @@
-﻿#include "PlayerController.h"
+#include "PlayerController.h"
 #include "Input.h"
 #include "Camera.h"
 #include "Math.h"

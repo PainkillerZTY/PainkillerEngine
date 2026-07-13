@@ -1,4 +1,4 @@
-﻿#include "VoxelGame.h"
+#include "VoxelGame.h"
 #include "Logger.h"
 #include "Math.h"
 #include "BlockRaycast.h"
@@ -486,7 +486,7 @@ void VoxelGame::Update(Engine* engine, f32 deltaTime) {
     if (!m_initialized) return;
      m_gameTime += deltaTime;
      UpdateChunks(engine);
-     HandleBlockInteraction(engine);
+     HandleBlockInteraction(engine, deltaTime);
      m_player.Update(engine, deltaTime);
      // Update water physics
      {
@@ -507,42 +507,45 @@ void VoxelGame::Update(Engine* engine, f32 deltaTime) {
      HandleHotbarSelection(engine->GetInput());
 }
 
-void VoxelGame::HandleBlockInteraction(Engine* engine) {
+void VoxelGame::HandleBlockInteraction(Engine* engine, f32 deltaTime) {
     auto* input = engine->GetInput();
     auto* camera = m_player.GetCamera();
     Vec3 eyePos = m_player.GetPosition();
     Vec3 forward = camera->GetForward();
     m_raycastResult = BlockRaycast::Cast(eyePos, forward, 8.0f, m_world);
 
+    // Block breaking with timer delay
     if (input->IsMouseDown(0) && m_raycastResult.hit) {
-        BlockType block = m_world->GetBlock(m_raycastResult.blockX,
-                                             m_raycastResult.blockY,
-                                             m_raycastResult.blockZ);
+        BlockType block = m_world->GetBlock(m_raycastResult.blockX, m_raycastResult.blockY, m_raycastResult.blockZ);
         if (block != BlockType::Air && block != BlockType::Water) {
-            Vec3 wp((f32)m_raycastResult.blockX + 0.5f,
-                    (f32)m_raycastResult.blockY + 0.5f,
-                    (f32)m_raycastResult.blockZ + 0.5f);
-            Vec3 bc = BlockInfo::GetFaceColor(block, BlockFace::Top);
-            m_world->SetBlock(m_raycastResult.blockX, m_raycastResult.blockY,
-                              m_raycastResult.blockZ, BlockType::Air);
-            m_particleSystem.SpawnBreakParticles(wp, bc, 12);
-            m_soundManager.PlayBlockBreak();
-        }
-    }
+            if (!m_isBreaking || m_breakX != m_raycastResult.blockX ||
+                m_breakY != m_raycastResult.blockY || m_breakZ != m_raycastResult.blockZ) {
+                m_isBreaking = true; m_breakTimer = 0.0f;
+                m_breakX = m_raycastResult.blockX; m_breakY = m_raycastResult.blockY; m_breakZ = m_raycastResult.blockZ;
+            }
+            f32 h = BlockInfo::GetHardness(block); if (h <= 0.0f) h = 0.3f;
+            m_breakTimer += deltaTime;
+            if (m_breakTimer >= h) {
+                Vec3 wp((f32)m_breakX+0.5f,(f32)m_breakY+0.5f,(f32)m_breakZ+0.5f);
+                Vec3 bc = BlockInfo::GetFaceColor(block, BlockFace::Top);
+                m_world->SetBlock(m_breakX,m_breakY,m_breakZ,BlockType::Air);
+                m_particleSystem.SpawnBreakParticles(wp,bc,12);
+                m_soundManager.PlayBlockBreak();
+                m_isBreaking = false; m_breakTimer = 0.0f;
+            }
+        } else { m_isBreaking = false; m_breakTimer = 0.0f; }
+    } else { m_isBreaking = false; m_breakTimer = 0.0f; }
 
+    // Block placement (right-click)
     if (input->IsMousePressed(1) && m_raycastResult.hit && m_placeCooldown <= 0.0f) {
-        BlockType placeBlock = GetSelectedBlock();
-        BlockType existing = m_world->GetBlock(m_raycastResult.placeX,
-                                                m_raycastResult.placeY,
-                                                m_raycastResult.placeZ);
-        if (existing == BlockType::Air && BlockInfo::IsSolid(placeBlock)) {
-            m_world->SetBlock(m_raycastResult.placeX, m_raycastResult.placeY,
-                              m_raycastResult.placeZ, placeBlock);
+        BlockType pb = GetSelectedBlock();
+        BlockType ex = m_world->GetBlock(m_raycastResult.placeX,m_raycastResult.placeY,m_raycastResult.placeZ);
+        if (ex == BlockType::Air && BlockInfo::IsSolid(pb)) {
+            m_world->SetBlock(m_raycastResult.placeX,m_raycastResult.placeY,m_raycastResult.placeZ,pb);
             m_soundManager.PlayBlockPlace();
             m_placeCooldown = 0.15f;
         }
     }
-
     if (input->IsKeyPressed(VK_ESCAPE)) engine->Stop();
 }
 

@@ -1,4 +1,4 @@
-﻿#include "SoundManager.h"
+#include "SoundManager.h"
 #include "Logger.h"
 
 namespace painkiller {

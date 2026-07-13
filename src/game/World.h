@@ -7,7 +7,7 @@
 //
 // Key methods: GetBlock/SetBlock, UpdateChunksAround, Render
 // ============================================================
-﻿#pragma once
+#pragma once
 
 #include "Types.h"
 #include "Chunk.h"

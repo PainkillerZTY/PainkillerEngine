@@ -1,4 +1,4 @@
-﻿#include "Noise.h"
+#include "Noise.h"
 #include "Math.h"
 #include <cmath>
 #include <algorithm>

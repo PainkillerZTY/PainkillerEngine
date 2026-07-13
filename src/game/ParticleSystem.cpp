@@ -1,4 +1,4 @@
-﻿#include "ParticleSystem.h"
+#include "ParticleSystem.h"
 #include "Logger.h"
 #include "Math.h"
 #include <cstdlib>
