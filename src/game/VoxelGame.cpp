@@ -388,6 +388,21 @@ bool VoxelGame::Initialize(Engine* engine) {
         sb.indexCount = 36;
         m_skyboxMesh = renderer->CreateMesh(sb);
     }
+    // 9. Wireframe cube mesh for block highlight (12 lines, LINE_LIST)
+    {
+        MeshData wf;
+        wf.vertexStride = 3*sizeof(f32);
+        f32 wfVerts[] = {
+            -0.5f,-0.5f,-0.5f, 0.5f,-0.5f,-0.5f, 0.5f, 0.5f,-0.5f, -0.5f, 0.5f,-0.5f,
+            -0.5f,-0.5f, 0.5f, 0.5f,-0.5f, 0.5f, 0.5f, 0.5f, 0.5f, -0.5f, 0.5f, 0.5f
+        };
+        wf.vertices.assign(wfVerts, wfVerts+24);
+        wf.vertexCount = 8;
+        u32 wfIdx[] = {0,1, 1,2, 2,3, 3,0, 4,5, 5,6, 6,7, 7,4, 0,4, 1,5, 2,6, 3,7};
+        wf.indices.assign(wfIdx, wfIdx+24);
+        wf.indexCount = 24;
+        m_wireframeCubeMesh = renderer->CreateMesh(wf);
+    }
 
     m_initialized = true;
     LOG_INFO("VoxelGame initialized");
@@ -476,6 +491,32 @@ void VoxelGame::SetupShadersAndPipeline(Renderer* renderer) {
             sp.blendMode = BlendMode::Opaque;
             sp.vertexLayout = { {"POSITION", Format::R32G32B32_FLOAT, 0, 0} };
             m_skyboxPipeline = renderer->CreatePipelineState(sp);
+        }
+    }
+    // Wireframe pipeline for block highlight (LINE_LIST)
+    {
+        const char* wfVS = R"(#version 330 core
+            layout(location=0) in vec3 a_Position;
+            uniform mat4 u_View; uniform mat4 u_Projection;
+            void main() { gl_Position = u_Projection * u_View * vec4(a_Position, 1.0); }
+        )";
+        const char* wfFS = R"(#version 330 core
+            uniform vec4 u_Color; out vec4 FragColor;
+            void main() { FragColor = u_Color; }
+        )";
+        ShaderDesc wvs; wvs.stage=ShaderStage::Vertex; wvs.source=wfVS;
+        ShaderDesc wfs; wfs.stage=ShaderStage::Fragment; wfs.source=wfFS;
+        m_wireframeVS=renderer->CreateShader(wvs);
+        m_wireframeFS=renderer->CreateShader(wfs);
+        if(m_wireframeVS!=kInvalidHandle && m_wireframeFS!=kInvalidHandle){
+            PipelineStateDesc wp;
+            wp.vertexShader=&wvs; wp.fragmentShader=&wfs;
+            wp.topology=PrimitiveTopology::LineList;
+            wp.cullMode=CullMode::None;
+            wp.depthTestEnabled=true; wp.depthWriteEnabled=false;
+            wp.depthFunc=CompareFunction::Less;
+            wp.vertexLayout={{"POSITION",Format::R32G32B32_FLOAT,0,0}};
+            m_wireframePipeline=renderer->CreatePipelineState(wp);
         }
     }
     
@@ -578,6 +619,8 @@ void VoxelGame::Render(Engine* engine, f32 deltaTime) {
         m_particleSystem.Render(renderer);
         RenderHeldBlock(renderer, camera);
     }
+    // Block highlight wireframe
+    RenderBlockHighlight(renderer, camera);
     
     // Always render UI
     RenderUI(renderer, ww, wh);
@@ -753,6 +796,23 @@ void VoxelGame::RenderHeldBlock(Renderer* renderer, Camera* camera) {
     renderer->DrawMesh(m_heldBlockMesh);
 }
 
+void VoxelGame::RenderBlockHighlight(Renderer* renderer, Camera* camera) {
+    if (m_wireframePipeline == kInvalidHandle || m_wireframeCubeMesh == kInvalidHandle) return;
+    if (!m_raycastResult.hit) return;
+    Vec3 blockPos((f32)m_raycastResult.blockX + 0.5f, (f32)m_raycastResult.blockY + 0.5f, (f32)m_raycastResult.blockZ + 0.5f);
+    renderer->BindPipelineState(m_wireframePipeline);
+    renderer->SetUniformMat4("u_View", camera->GetViewMatrix());
+    renderer->SetUniformMat4("u_Projection", camera->GetProjectionMatrix());
+    Mat4 model = glm::translate(Mat4(1.0f), blockPos);
+    renderer->SetUniformMat4("u_Model", model);
+    renderer->SetUniformVec4("u_Color", Vec4(0.0f, 0.0f, 0.0f, 1.0f));
+    renderer->DrawMesh(m_wireframeCubeMesh);
+    // Outer highlight
+    model = glm::scale(glm::translate(Mat4(1.0f), blockPos), Vec3(1.02f));
+    renderer->SetUniformMat4("u_Model", model);
+    renderer->SetUniformVec4("u_Color", Vec4(1.0f, 1.0f, 1.0f, 0.8f));
+    renderer->DrawMesh(m_wireframeCubeMesh);
+}
 void VoxelGame::Shutdown(Engine* engine) {
     if (!m_initialized) return;
     m_initialized = false;
@@ -773,6 +833,10 @@ void VoxelGame::Shutdown(Engine* engine) {
         if (m_skyboxPipeline != kInvalidHandle) r->DestroyPipelineState(m_skyboxPipeline);
         if (m_skyboxVS != kInvalidHandle) r->DestroyShader(m_skyboxVS);
         if (m_skyboxFS != kInvalidHandle) r->DestroyShader(m_skyboxFS);
+        if (m_wireframeCubeMesh != kInvalidHandle) r->DestroyMesh(m_wireframeCubeMesh);
+        if (m_wireframePipeline != kInvalidHandle) r->DestroyPipelineState(m_wireframePipeline);
+        if (m_wireframeVS != kInvalidHandle) r->DestroyShader(m_wireframeVS);
+        if (m_wireframeFS != kInvalidHandle) r->DestroyShader(m_wireframeFS);
         }
     }
     m_particleSystem.Shutdown();

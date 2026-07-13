@@ -41,6 +41,7 @@ private:
     void RenderUI(Renderer* renderer, f32 winW, f32 winH);
     void RenderCrosshair(Renderer* renderer);
     void RenderHeldBlock(Renderer* renderer, Camera* camera);
+    void RenderBlockHighlight(Renderer* renderer, Camera* camera);
     void RenderDebugInfo(Engine* engine);
 
     // World
@@ -71,7 +72,10 @@ private:
     ShaderHandle m_skyboxFS = kInvalidHandle;
     PipelineHandle m_skyboxPipeline = kInvalidHandle;
     MeshHandle m_skyboxMesh = kInvalidHandle;
-
+    ShaderHandle m_wireframeVS = kInvalidHandle;
+    ShaderHandle m_wireframeFS = kInvalidHandle;
+    PipelineHandle m_wireframePipeline = kInvalidHandle;
+    MeshHandle m_wireframeCubeMesh = kInvalidHandle;
 
     // State
     bool m_initialized = false;
