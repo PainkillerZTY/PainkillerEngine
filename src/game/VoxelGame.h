@@ -42,6 +42,7 @@ private:
     void RenderCrosshair(Renderer* renderer);
     void RenderHeldBlock(Renderer* renderer, Camera* camera);
     void RenderBlockHighlight(Renderer* renderer, Camera* camera);
+    void RenderPlayerModel(Renderer* renderer, Camera* camera, f32 deltaTime);
     void RenderDebugInfo(Engine* engine);
 
     // World
@@ -76,6 +77,10 @@ private:
     ShaderHandle m_wireframeFS = kInvalidHandle;
     PipelineHandle m_wireframePipeline = kInvalidHandle;
     MeshHandle m_wireframeCubeMesh = kInvalidHandle;
+    ShaderHandle m_playerVS = kInvalidHandle;
+    ShaderHandle m_playerFS = kInvalidHandle;
+    PipelineHandle m_playerPipeline = kInvalidHandle;
+    MeshHandle m_playerCubeMesh = kInvalidHandle;
 
     // State
     bool m_initialized = false;
