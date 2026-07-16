@@ -35,6 +35,10 @@ private:
         Forest,
         Snowy,
         Ocean,
+        Swamp,
+        Taiga,
+        Jungle,
+        Mountains,
     };
 
     Biome GetBiome(f32 worldX, f32 worldZ) const;

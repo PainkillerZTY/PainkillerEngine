@@ -44,7 +44,7 @@ static const Vec3 kFaceVerts[6][4] = {
     // +Y (Top) - CCW when viewed from +Y
     { Vec3(0,1,0), Vec3(0,1,1), Vec3(1,1,1), Vec3(1,1,0) },
     // -Y (Bottom) - CCW when viewed from -Y
-    { Vec3(0,0,0), Vec3(1,0,0), Vec3(1,0,1), Vec3(0,0,1) },
+    { Vec3(0,0,1), Vec3(1,0,1), Vec3(1,0,0), Vec3(0,0,0) },
     // +Z (Front)
     { Vec3(1,0,1), Vec3(1,1,1), Vec3(0,1,1), Vec3(0,0,1) },
     // -Z (Back)
@@ -71,6 +71,8 @@ static const i32 kFaceChecks[6][3] = {
 
 static bool ShouldRenderFace(BlockType blockType, BlockType neighborType) {
     if (blockType == BlockType::Air) return false;
+    // Water: render if neighbor is not water (show against air AND solid blocks)
+    if (blockType == BlockType::Water) return neighborType != BlockType::Water;
     // Render face if neighbor is air, water, or leaves (transparent)
     return neighborType == BlockType::Air ||
            neighborType == BlockType::Water ||

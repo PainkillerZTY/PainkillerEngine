@@ -49,6 +49,9 @@ public:
      Vec3 GetForward() const;
      Vec3 GetRight() const;
      
+     f32 GetYaw() const { return m_euler.y; }
+     f32 GetPitch() const { return m_euler.x; }
+     
      // Dynamic FOV (sprint FOV expansion, smooth transitions)
      void SetTargetFOV(f32 fovDeg) { m_targetFOV = fovDeg; }
      f32 GetTargetFOV() const { return m_targetFOV; }

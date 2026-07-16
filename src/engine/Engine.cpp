@@ -1,7 +1,7 @@
  #include "Engine.h"
  #include "Logger.h"
  #include "OpenGLRenderer.h"
- #include <windowsx.h>
+#include <windowsx.h>
 
 namespace painkiller {
 
@@ -112,12 +112,22 @@ namespace painkiller {
         return false;
     }
     
-     LOG_INFO("Painkiller Engine initialized successfully");
+         
+    
+    
+            
+    
+    LOG_INFO("Painkiller Engine initialized successfully");
     return true;
 }
 
 void Engine::Shutdown() {
     if (!m_initialized) return;
+    
+    // Shutdown ImGui
+    
+    
+    
     
     if (m_onShutdown) m_onShutdown(this);
     
@@ -150,6 +160,11 @@ void Engine::Run() {
      ShowCursor(FALSE);
     
     while (m_running && m_window.IsOpen()) {
+        // Start ImGui frame
+        
+        
+        
+        
         // ?? Begin Frame ??
         m_timer.Tick();
         m_input.BeginFrame();
@@ -176,6 +191,10 @@ void Engine::Run() {
         if (m_onRender) m_onRender(this, dt);
         
         m_scene.RenderScene(m_renderer.get(), dt);
+        
+        // Render ImGui
+        
+        
         
         m_renderer->EndFrame();
         m_renderer->Present();

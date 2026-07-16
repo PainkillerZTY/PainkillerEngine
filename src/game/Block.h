@@ -23,6 +23,17 @@ enum class BlockType : u8 {
     Water,
     Snow,
     Bedrock,
+    CoalOre,
+    IronOre,
+    GoldOre,
+    DiamondOre,
+    CraftingTable,
+    Furnace,
+    FurnaceLit,
+    Chest,
+    Glass,
+    Bookshelf,
+    Sticks,
     // Add more as needed
     NumTypes,
 };
@@ -99,6 +110,17 @@ namespace BlockColors {
     const Vec3 Water        = Vec3(0.20f, 0.40f, 0.80f);
     const Vec3 Snow         = Vec3(0.95f, 0.95f, 0.98f);
     const Vec3 Bedrock      = Vec3(0.20f, 0.20f, 0.20f);
+    const Vec3 CoalOre      = Vec3(0.25f, 0.25f, 0.25f);
+    const Vec3 IronOre      = Vec3(0.75f, 0.65f, 0.55f);
+    const Vec3 GoldOre      = Vec3(0.85f, 0.75f, 0.20f);
+    const Vec3 DiamondOre   = Vec3(0.30f, 0.80f, 0.80f);
+    const Vec3 CraftingTableTop = Vec3(0.55f, 0.45f, 0.30f);
+    const Vec3 CraftingTableSide = Vec3(0.45f, 0.35f, 0.22f);
+    const Vec3 FurnaceTop    = Vec3(0.40f, 0.40f, 0.40f);
+    const Vec3 FurnaceSide   = Vec3(0.45f, 0.40f, 0.35f);
+    const Vec3 FurnaceFront  = Vec3(0.30f, 0.30f, 0.30f);
+    const Vec3 Glass         = Vec3(0.60f, 0.80f, 0.90f);
+    const Vec3 Bookshelf     = Vec3(0.45f, 0.32f, 0.18f);
 }
 
 } // namespace painkiller

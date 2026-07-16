@@ -32,7 +32,7 @@ void TreeGenerator::PlaceTree(TerrainGenerator* terrain, Chunk* chunk,
     i32 canopyRadius = 2;
 
     // Trunk
-    for (i32 dy = 1; dy <= trunkHeight; ++dy) {
+    for (i32 dy = 0; dy <= trunkHeight; ++dy) {
         SetBlockAt(terrain, chunk, chunkX, chunkZ,
                    worldX, worldY + dy, worldZ,
                    BlockType::OakLog);
@@ -44,7 +44,7 @@ void TreeGenerator::PlaceTree(TerrainGenerator* terrain, Chunk* chunk,
     // Top layer: 3x3
     for (i32 dx = -1; dx <= 1; ++dx) {
         for (i32 dz = -1; dz <= 1; ++dz) {
-            if (dx == 0 && dz == 0) continue; // Don't place on top of trunk
+            // Place leaf at center to cap the canopy top
             SetBlockAt(terrain, chunk, chunkX, chunkZ,
                        worldX + dx, topY, worldZ + dz,
                        BlockType::Leaves);

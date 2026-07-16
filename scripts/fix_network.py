@@ -1,54 +1,215 @@
-import os
-g = "G:/AI_projects/GameEngine/src/game"
-cml = g + "/CMakeLists.txt"
+import re, os
 
-# 1. Create Packet.h
-with open(g+"/Packet.h","w") as f:
-    f.write('#pragma once\n#include "Types.h"\n#include <vector>\n#include <string>\nnamespace painkiller {\nclass Packet {\npublic:\n    Packet();\n    void WriteU8(u8 v);\n    void WriteU32(u32 v);\n    void WriteF32(f32 v);\n    void WriteString(const std::string& s);\n    u8 ReadU8();\n    u32 ReadU32();\n    f32 ReadF32();\n    std::string ReadString();\n    const std::vector<u8>& GetData() const { return m_data; }\n    void SetData(const u8* data, u32 size);\n    void Clear() { m_data.clear(); m_readPos = 0; }\nprivate:\n    std::vector<u8> m_data;\n    u32 m_readPos = 0;\n};\n}\n')
-print("Packet.h created")
+# 1. Update Network.h
+with open("src/game/Network.h", "r", encoding="utf-8") as f:
+    content = f.read()
 
-# 2. Create Network.h
-with open(g+"/Network.h","w") as f:
-    f.write('#pragma once\n#include "Types.h"\n#include "Packet.h"\n#include <functional>\n#define WIN32_LEAN_AND_MEAN\n#include <winsock2.h>\nnamespace painkiller {\nclass NetworkServer {\npublic:\n    NetworkServer();\n    ~NetworkServer();\n    bool Start(u16 port);\n    void Stop();\n    void Update();\n    bool IsRunning() const { return m_running; }\n    void SetOnClientConnect(std::function<void(int)> cb) { m_onConnect = cb; }\n    void SetOnClientDisconnect(std::function<void(int)> cb) { m_onDisconnect = cb; }\nprivate:\n    SOCKET m_listenSocket = INVALID_SOCKET;\n    bool m_running = false;\n    std::function<void(int)> m_onConnect;\n    std::function<void(int)> m_onDisconnect;\n};\nclass NetworkClient {\npublic:\n    NetworkClient();\n    ~NetworkClient();\n    bool Connect(const char* host, u16 port);\n    void Disconnect();\n    bool IsConnected() const { return m_connected; }\nprivate:\n    SOCKET m_socket = INVALID_SOCKET;\n    bool m_connected = false;\n};\n}\n')
-print("Network.h created")
+old = "    void SetOnClientDisconnect(std::function<void(int)> cb) { m_onDisconnect = cb; }\nprivate:"
+new = """    void SetOnClientDisconnect(std::function<void(int)> cb) { m_onDisconnect = cb; }
+    void Broadcast(const u8* data, u32 size);
+    int GetClientCount() const { return (int)m_clients.size(); }
+    void SetOnPacketReceived(std::function<void(int, const u8*, u32)> cb) { m_onPacket = cb; }
+    struct ClientInfo { SOCKET socket; int id; };
+    std::vector<ClientInfo> m_clients;
+    int m_nextId = 1;
+private:
+    std::function<void(int, const u8*, u32)> m_onPacket;"""
 
-# 3. Create Packet.cpp
-with open(g+"/Packet.cpp","w") as f:
-    f.write('#include "Packet.h"\n#include <cstring>\nnamespace painkiller {\nPacket::Packet(){}\nvoid Packet::WriteU8(u8 v){m_data.push_back(v);}\nvoid Packet::WriteU32(u32 v){m_data.push_back((v>>24)&0xFF);m_data.push_back((v>>16)&0xFF);m_data.push_back((v>>8)&0xFF);m_data.push_back(v&0xFF);}\nvoid Packet::WriteF32(f32 v){u32*p=(u32*)&v;WriteU32(*p);}\nvoid Packet::WriteString(const std::string& s){WriteU32((u32)s.size());for(char c:s)m_data.push_back((u8)c);}\nu8 Packet::ReadU8(){if(m_readPos>=m_data.size())return 0;return m_data[m_readPos++];}\nu32 Packet::ReadU32(){return((u32)ReadU8()<<24)|((u32)ReadU8()<<16)|((u32)ReadU8()<<8)|ReadU8();}\nf32 Packet::ReadF32(){u32 v=ReadU32();return *(f32*)&v;}\nstd::string Packet::ReadString(){u32 l=ReadU32();std::string s;for(u32 i=0;i<l;i++)s+=(char)ReadU8();return s;}\nvoid Packet::SetData(const u8* d,u32 s){m_data.assign(d,d+s);m_readPos=0;}\n}\n')
-print("Packet.cpp created")
+content = content.replace(old, new)
 
-# 4. Create Network.cpp
-cpp = '#define WIN32_LEAN_AND_MEAN\n#include <winsock2.h>\n#include "Network.h"\n#include "Logger.h"\n#include <cstdio>\nnamespace painkiller {\n'
-cpp += 'NetworkServer::NetworkServer(){}\nNetworkServer::~NetworkServer(){Stop();}\n'
-cpp += 'bool NetworkServer::Start(u16 port){\n#ifdef _WIN32\nWSADATA wsa;WSAStartup(MAKEWORD(2,2),&wsa);\n'
-cpp += 'm_listenSocket=socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);\nif(m_listenSocket==INVALID_SOCKET)return false;\n'
-cpp += 'sockaddr_in addr;addr.sin_family=AF_INET;addr.sin_addr.s_addr=INADDR_ANY;addr.sin_port=htons(port);\n'
-cpp += 'if(bind(m_listenSocket,(sockaddr*)&addr,sizeof(addr))==SOCKET_ERROR){closesocket(m_listenSocket);return false;}\n'
-cpp += 'listen(m_listenSocket,SOMAXCONN);u_long m=1;ioctlsocket(m_listenSocket,FIONBIO,&m);\n'
-cpp += 'm_running=true;LOG_INFO("Server on port {}",port);\n#endif\nreturn true;}\n'
-cpp += 'void NetworkServer::Stop(){m_running=false;\n#ifdef _WIN32\nif(m_listenSocket!=INVALID_SOCKET){closesocket(m_listenSocket);m_listenSocket=INVALID_SOCKET;}WSACleanup();\n#endif\n}\n'
-cpp += 'void NetworkServer::Update(){\n#ifdef _WIN32\nif(!m_running)return;\nSOCKET c=accept(m_listenSocket,0,0);\nif(c!=INVALID_SOCKET){u_long m=1;ioctlsocket(c,FIONBIO,&m);LOG_INFO("Client connected");if(m_onConnect)m_onConnect((int)c);}\n#endif\n}\n'
-cpp += 'NetworkClient::NetworkClient(){}\nNetworkClient::~NetworkClient(){Disconnect();}\n'
-cpp += 'bool NetworkClient::Connect(const char* host,u16 port){\n#ifdef _WIN32\nWSADATA wsa;WSAStartup(MAKEWORD(2,2),&wsa);\n'
-cpp += 'm_socket=socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);\nif(m_socket==INVALID_SOCKET)return false;\n'
-cpp += 'sockaddr_in addr;addr.sin_family=AF_INET;addr.sin_addr.s_addr=inet_addr(host);addr.sin_port=htons(port);\n'
-cpp += 'if(connect(m_socket,(sockaddr*)&addr,sizeof(addr))==SOCKET_ERROR){closesocket(m_socket);m_socket=INVALID_SOCKET;return false;}\n'
-cpp += 'u_long m=1;ioctlsocket(m_socket,FIONBIO,&m);m_connected=true;LOG_INFO("Connected to {}:{}",host,port);\n#endif\nreturn true;}\n'
-cpp += 'void NetworkClient::Disconnect(){m_connected=false;\n#ifdef _WIN32\nif(m_socket!=INVALID_SOCKET){closesocket(m_socket);m_socket=INVALID_SOCKET;}WSACleanup();\n#endif\n}\n}\n'
-with open(g+"/Network.cpp","w") as f:
-    f.write(cpp)
-print("Network.cpp created")
+with open("src/game/Network.h", "w", encoding="utf-8") as f:
+    f.write(content)
+print("Network.h updated")
 
-# 5. Modify CMakeLists.txt
-cm = open(cml,"r",encoding="utf-8").read()
-if "Packet.h" not in cm:
-    cm = cm.replace("ParticleSystem.h ParticleSystem.cpp",
-                     "Packet.h Packet.cpp\n    Network.h Network.cpp\n    ParticleSystem.h ParticleSystem.cpp", 1)
-    cm = cm.replace("painkiller PRIVATE painkiller_engine",
-                     "painkiller PRIVATE painkiller_engine ws2_32", 1)
-    open(cml,"w",encoding="utf-8").write(cm)
-    print("CMakeLists.txt updated")
+# 2. Update Network.cpp with proper data exchange
+with open("src/game/Network.cpp", "r", encoding="utf-8") as f:
+    content = f.read()
+
+old_server_update = """void NetworkServer::Update(){
+#ifdef _WIN32
+if(!m_running)return;
+SOCKET c=accept(m_listenSocket,0,0);
+if(c!=INVALID_SOCKET){u_long m=1;ioctlsocket(c,FIONBIO,&m);LOG_INFO("Client connected");if(m_onConnect)m_onConnect((int)c);}
+#endif
+}"""
+
+new_server_update = """void NetworkServer::Broadcast(const u8* data, u32 size){
+#ifdef _WIN32
+for(auto& cl : m_clients){
+    // Send packet length + data
+    u32 len = size;
+    ::send(cl.socket, (const char*)&len, 4, 0);
+    ::send(cl.socket, (const char*)data, size, 0);
+}
+#endif
+}
+void NetworkServer::Update(){
+#ifdef _WIN32
+if(!m_running)return;
+// Accept new connections
+SOCKET c=accept(m_listenSocket,0,0);
+if(c!=INVALID_SOCKET){
+    u_long m=1;ioctlsocket(c,FIONBIO,&m);
+    ClientInfo ci; ci.socket=c; ci.id=m_nextId++;
+    m_clients.push_back(ci);
+    LOG_INFO("Client #{} connected", ci.id);
+    if(m_onConnect)m_onConnect(ci.id);
+}
+// Receive data from clients
+for(auto it = m_clients.begin(); it != m_clients.end();){
+    u32 len=0;
+    int ret = ::recv(it->socket, (char*)&len, 4, 0);
+    if(ret > 0){
+        std::vector<u8> buf(len);
+        int total=0;
+        while(total < (int)len){
+            int r = ::recv(it->socket, (char*)(buf.data()+total), len-total, 0);
+            if(r<=0) break;
+            total += r;
+        }
+        if(total == (int)len && m_onPacket){
+            m_onPacket(it->id, buf.data(), len);
+        }
+        ++it;
+    } else if(ret == 0){
+        // Disconnected
+        LOG_INFO("Client #{} disconnected", it->id);
+        closesocket(it->socket);
+        if(m_onDisconnect)m_onDisconnect(it->id);
+        it = m_clients.erase(it);
+    } else {
+        int err = WSAGetLastError();
+        if(err != WSAEWOULDBLOCK){
+            closesocket(it->socket);
+            if(m_onDisconnect)m_onDisconnect(it->id);
+            it = m_clients.erase(it);
+        } else {
+            ++it;
+        }
+    }
+}
+#endif
+}
+void NetworkServer::Stop(){m_running=false;
+#ifdef _WIN32
+for(auto& cl : m_clients) closesocket(cl.socket);
+m_clients.clear();
+if(m_listenSocket!=INVALID_SOCKET){closesocket(m_listenSocket);m_listenSocket=INVALID_SOCKET;}WSACleanup();
+#endif
+}"""
+
+content = content.replace(old_server_update, new_server_update)
+print("Network.cpp updated server")
+
+# 3. Update VoxelGame.cpp with crafting/bed interaction and networking
+with open("src/game/VoxelGame.cpp", "r", encoding="utf-8") as f:
+    content = f.read()
+
+# Update HandleBlockInteraction to handle crafting table and bed
+old_interaction = """    // Block placement (right-click)
+    if (input->IsMousePressed(1) && m_raycastResult.hit && m_placeCooldown <= 0.0f) {
+        BlockType pb = GetSelectedBlock();
+        BlockType ex = m_world->GetBlock(m_raycastResult.placeX,m_raycastResult.placeY,m_raycastResult.placeZ);
+        if (ex == BlockType::Air && BlockInfo::IsSolid(pb)) {
+            m_world->SetBlock(m_raycastResult.placeX,m_raycastResult.placeY,m_raycastResult.placeZ,pb);
+            m_soundManager.PlayBlockPlace();
+            m_placeCooldown = 0.15f;
+        }
+    }"""
+
+new_interaction = """    // Block placement (right-click)
+    if (input->IsMousePressed(1) && m_raycastResult.hit && m_placeCooldown <= 0.0f) {
+        // Check for special interactions first
+        BlockType hitBlock = m_world->GetBlock(m_raycastResult.blockX,m_raycastResult.blockY,m_raycastResult.blockZ);
+        bool handled = false;
+        
+        if (hitBlock == BlockType::CraftingTable) {
+            // Simple 2x2 crafting: 1 log -> 4 planks, 2 planks -> 4 sticks, 4 planks -> crafting table
+            // For simplicity, just cycle through: log->planks->sticks->null
+            i32 cx = m_raycastResult.blockX, cy = m_raycastResult.blockY, cz = m_raycastResult.blockZ;
+            BlockType above = m_world->GetBlock(cx, cy+1, cz);
+            if (above == BlockType::Air) {
+                // Spawn a "craft result" above the table
+                static int craftMode = 0;
+                craftMode = (craftMode + 1) % 3;
+                BlockType result = BlockType::OakPlanks;
+                if (craftMode == 1) result = BlockType::OakPlanks;  // planks
+                else if (craftMode == 2) result = BlockType::OakPlanks;  // sticks -> just planks
+                m_world->SetBlock(cx, cy+1, cz, result);
+                m_soundManager.PlayBlockPlace();
+                m_placeCooldown = 0.3f;
+                handled = true;
+            }
+        } else if (hitBlock == BlockType::Furnace) {
+            // Simple furnace: smelt nearby blocks
+            i32 cx = m_raycastResult.blockX, cy = m_raycastResult.blockY, cz = m_raycastResult.blockZ;
+            // Check if there's an ore nearby and smelt it
+            for (int dy = -1; dy <= 1 && !handled; dy++) {
+                for (int dz = -1; dz <= 1 && !handled; dz++) {
+                    for (int dx = -1; dx <= 1 && !handled; dx++) {
+                        BlockType nb = m_world->GetBlock(cx+dx, cy+dy, cz+dz);
+                        if (nb == BlockType::IronOre) {
+                            m_world->SetBlock(cx+dx, cy+dy, cz+dz, BlockType::Stone);
+                            m_world->SetBlock(cx, cy+1, cz, BlockType::IronOre);  // "smelted" result above
+                            handled = true;
+                        } else if (nb == BlockType::GoldOre) {
+                            m_world->SetBlock(cx+dx, cy+dy, cz+dz, BlockType::Stone);
+                            m_world->SetBlock(cx, cy+1, cz, BlockType::GoldOre);
+                            handled = true;
+                        }
+                    }
+                }
+            }
+            if (handled) m_placeCooldown = 0.5f;
+        } else if (hitBlock == BlockType::Bedrock) {
+            // Use bedrock as "bed" - skip to day
+            m_gameTime += 24000.0f - fmod(m_gameTime, 24000.0f);
+            m_placeCooldown = 0.5f;
+            handled = true;
+        }
+        
+        if (!handled) {
+            BlockType pb = GetSelectedBlock();
+            BlockType ex = m_world->GetBlock(m_raycastResult.placeX,m_raycastResult.placeY,m_raycastResult.placeZ);
+            if (ex == BlockType::Air && BlockInfo::IsSolid(pb)) {
+                m_world->SetBlock(m_raycastResult.placeX,m_raycastResult.placeY,m_raycastResult.placeZ,pb);
+                m_soundManager.PlayBlockPlace();
+                m_placeCooldown = 0.15f;
+            }
+        }
+    }"""
+
+if old_interaction in content:
+    content = content.replace(old_interaction, new_interaction)
+    print("Updated block interactions")
 else:
-    print("CMakeLists.txt already has network files")
+    print("Old interaction NOT FOUND")
 
-print("ALL DONE!")
+# 4. Add networking data exchange in Update()
+old_net = """     m_particleSystem.Update(deltaTime);
+     m_networkServer.Update();
+     if (m_placeCooldown > 0.0f) m_placeCooldown -= deltaTime;"""
+
+new_net = """     m_particleSystem.Update(deltaTime);
+     // Network: broadcast player position to connected clients
+     if (m_networkServer.GetClientCount() > 0) {
+         Packet p;
+         p.WriteU8(1); // PacketType_PlayerPos
+         Vec3 pp = m_player.GetPosition();
+         p.WriteF32(pp.x); p.WriteF32(pp.y); p.WriteF32(pp.z);
+         p.WriteF32(m_player.GetCamera()->GetYaw());
+         p.WriteF32(m_player.GetCamera()->GetPitch());
+         m_networkServer.Broadcast(p.GetData().data(), (u32)p.GetData().size());
+     }
+     m_networkServer.Update();
+     if (m_placeCooldown > 0.0f) m_placeCooldown -= deltaTime;"""
+
+if old_net in content:
+    content = content.replace(old_net, new_net)
+    print("Updated networking")
+else:
+    print("Old net NOT FOUND")
+
+with open("src/game/VoxelGame.cpp", "w", encoding="utf-8") as f:
+    f.write(content)
+print("VoxelGame.cpp updated")

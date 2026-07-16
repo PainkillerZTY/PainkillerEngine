@@ -1,5 +1,5 @@
  #include "Window.h"
- #include "Logger.h"
+#include "Logger.h"
  
  // Raw Input function pointers (loaded at runtime for MinGW compat)
  RegRawInputDevicesFn pfnRegisterRawInputDevices = nullptr;
@@ -127,6 +127,7 @@ LRESULT CALLBACK Window::WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
     
      if (!window) return DefWindowProc(hwnd, msg, wParam, lParam);
      
+     // Let ImGui handle input first
      // Forward input events to the engine via callback
      switch (msg) {
          case WM_KEYDOWN:
@@ -185,6 +186,4 @@ LRESULT CALLBACK Window::WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 }
 
 } // namespace painkiller
-
-
 
