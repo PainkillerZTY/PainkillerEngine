@@ -189,7 +189,7 @@ static const char* kWorldFragmentSrc = R"(
         else if (bt == 10) { // Water
             float wv2=waterWave(v_FragPos,u_Time);
             vec3 wc2=vec3(0.15,0.35,0.75),fc2=vec3(0.3,0.6,0.9);
-            color=mix(wc2,fc2,wv2*2.0+0.5); alpha=0.6;
+            color=mix(wc2,fc2,wv2*2.0+0.5);
         }
         else if (bt == 11) color = vec3(0.95,0.95,0.98);
         else if (bt == 12) color = vec3(0.20,0.20,0.20);
@@ -204,7 +204,7 @@ static const char* kWorldFragmentSrc = R"(
             else color=vec3(0.45,0.40,0.35);
         }
         else if (bt == 20) color = vec3(0.50,0.35,0.15);
-        else if (bt == 21) { color=vec3(0.60,0.80,0.90); alpha=0.35; }
+        else if (bt == 21) { color=vec3(0.60,0.80,0.90); }
         else if (bt == 22) color = vec3(0.45,0.32,0.18);
         else if (bt == 23) color = vec3(0.52,0.36,0.18);
         
