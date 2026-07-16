@@ -221,6 +221,7 @@ bool VoxelGame::Initialize(Engine* engine) {
 
     // 5. Sound
     m_soundManager.Initialize();
+    m_networkServer.Start(25565);
 
     // 6. Load initial chunks (try save file first)
     if (!m_world->LoadWorld("saves/world.sav")) {
@@ -592,6 +593,7 @@ void VoxelGame::Update(Engine* engine, f32 deltaTime) {
          cam->UpdateFOV(deltaTime);
      }
      m_particleSystem.Update(deltaTime);
+     m_networkServer.Update();
      if (m_placeCooldown > 0.0f) m_placeCooldown -= deltaTime;
      HandleHotbarSelection(engine->GetInput());
 }
@@ -933,6 +935,7 @@ void VoxelGame::Shutdown(Engine* engine) {
         }
     }
     m_particleSystem.Shutdown();
+    m_networkServer.Stop();
     m_soundManager.Shutdown();
     if (m_blockAtlas != kInvalidHandle && engine) {
         auto* r = engine->GetRenderer();

@@ -15,6 +15,7 @@
 #include "PlayerController.h"
 #include "ParticleSystem.h"
 #include "SoundManager.h"
+#include "Network.h"
 #include "BlockRaycast.h"
 #include "Block.h"
 
@@ -54,6 +55,7 @@ private:
     // Systems
     ParticleSystem m_particleSystem;
     SoundManager m_soundManager;
+    NetworkServer m_networkServer;
 
     // Shader/pipeline for world rendering
     ShaderHandle m_worldVS = kInvalidHandle;
