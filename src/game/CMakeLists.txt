@@ -16,5 +16,5 @@ add_executable(painkiller
     VoxelGame.h VoxelGame.cpp
 )
 
-target_include_directories(painkiller PRIVATE $\{CMAKE_CURRENT_SOURCE_DIR\})
+target_include_directories(painkiller PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(painkiller PRIVATE painkiller_engine ws2_32)

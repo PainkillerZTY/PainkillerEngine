@@ -150,17 +150,7 @@ static const char* kWorldFragmentSrc = R"(
         vec3 color;
         float alpha = 1.0;
         
-        if (cell >= 0) {
-            // Sample from atlas cell using face-local UV
-            float cols = u_AtlasGridX;
-            float rows = u_AtlasGridY;
-            float cellCol = mod(float(cell), cols);
-            float cellRow = floor(float(cell) / cols);
-            // stb_image flips Y when loading, so row 0 is at bottom of texture data
-            vec2 atlasUV = vec2((cellCol + uv.x) / cols, (cellRow + (1.0 - uv.y)) / rows);
-            vec4 texColor = texture(u_BlockAtlas, atlasUV);
-            color = texColor.rgb;
-        } else if (cell == -2) {
+        if (cell == -2) {
             // Water - animated semi-transparent blue
             float wave = waterWave(v_FragPos, u_Time);
             vec3 wc = vec3(0.15, 0.35, 0.75);
@@ -175,6 +165,48 @@ static const char* kWorldFragmentSrc = R"(
             color = vec3(f, 0.55, f * 0.4);
             alpha = 0.85;
         }
+        
+        // Flat colors - no atlas texture sampling needed
+        if (bt == 1 && face != 2 && face != 3) {
+            // Grass side: green at top, brown at bottom
+            color = mix(vec3(0.45,0.32,0.18), vec3(0.29,0.65,0.14), uv.y);
+        } else if (bt == 2 || (bt == 1 && face == 3)) {
+            color = vec3(0.45,0.32,0.18);  // Dirt brown
+        } else if (bt == 3) color = vec3(0.50,0.50,0.50); // Stone
+        else if (bt == 4) color = vec3(0.40,0.40,0.40); // Cobble
+        else if (bt == 5) color = vec3(0.42,0.29,0.13); // Wood
+        else if (bt == 6) { // OakLog
+            if (face == 2 || face == 3) color = vec3(0.55,0.37,0.16);
+            else color = vec3(0.42,0.29,0.13);
+        }
+        else if (bt == 7) { // Leaves
+            float ld2=fract(v_FragPos.x*3.0+v_FragPos.y*5.0+v_FragPos.z*7.0);
+            if (ld2<0.20) discard;
+            color = vec3(0.15,0.50,0.08); alpha = 0.85;
+        }
+        else if (bt == 8) color = vec3(0.52,0.36,0.18);
+        else if (bt == 9) color = vec3(0.76,0.70,0.50);
+        else if (bt == 10) { // Water
+            float wv2=waterWave(v_FragPos,u_Time);
+            vec3 wc2=vec3(0.15,0.35,0.75),fc2=vec3(0.3,0.6,0.9);
+            color=mix(wc2,fc2,wv2*2.0+0.5); alpha=0.6;
+        }
+        else if (bt == 11) color = vec3(0.95,0.95,0.98);
+        else if (bt == 12) color = vec3(0.20,0.20,0.20);
+        else if (bt == 13) color = vec3(0.25,0.25,0.22);
+        else if (bt == 14) color = vec3(0.75,0.60,0.50);
+        else if (bt == 15) color = vec3(0.85,0.70,0.15);
+        else if (bt == 16) color = vec3(0.20,0.70,0.75);
+        else if (bt == 17) color = (face==2)?vec3(0.55,0.45,0.30):vec3(0.45,0.35,0.22);
+        else if (bt == 18||bt==19) {
+            if(face==2||face==3)color=vec3(0.40,0.40,0.40);
+            else if(face==0||face==4)color=vec3(0.30,0.30,0.30);
+            else color=vec3(0.45,0.40,0.35);
+        }
+        else if (bt == 20) color = vec3(0.50,0.35,0.15);
+        else if (bt == 21) { color=vec3(0.60,0.80,0.90); alpha=0.35; }
+        else if (bt == 22) color = vec3(0.45,0.32,0.18);
+        else if (bt == 23) color = vec3(0.52,0.36,0.18);
         
         vec3 result = (ambient + diffuse + specular) * color;
         float dist = length(v_FragPos);

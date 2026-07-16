@@ -21,6 +21,27 @@ cmake --build build
 | RMB | Place block | F | Toggle flight |
 | 1-9/Scroll | Hotbar | Esc | Quit |
 
+## AI Team Structure
+See [docs/TEAM.md](docs/TEAM.md) for team roles and communication.
+See [docs/HANDOFF.md](docs/HANDOFF.md) for project handoff to AI developers.
+
+## Documentation
+| Document | Description |
+|----------|-------------|
+| [ARCHITECTURE.md](ARCHITECTURE.md) | System architecture |
+| [docs/TEAM.md](docs/TEAM.md) | Team structure |
+| [docs/HANDOFF.md](docs/HANDOFF.md) | AI developer handoff |
+| [docs/CODING_STANDARDS.md](docs/CODING_STANDARDS.md) | C++ coding standards |
+| [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) | Git workflow |
+| [docs/ROADMAP.md](docs/ROADMAP.md) | Development roadmap |
+
+## Build
+```
+cmake -B build -G Ninja
+cmake --build build --target painkiller
+./build/bin/painkiller.exe
+```
+
 ## Features
 - **World**: Infinite terrain, 4 biomes, caves, trees
 - **Blocks**: 10 types in 64×48 texture atlas

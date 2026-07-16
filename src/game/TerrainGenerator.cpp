@@ -31,7 +31,7 @@ i32 TerrainGenerator::GetHeightAt(i32 worldX, i32 worldZ) const {
     f32 nz = (f32)worldZ * 0.015f;
 
     // Base elevation: lower freq, more octaves for natural smooth rolling hills
-    f32 elevation = m_elevationNoise.FBM2D(nx, nz, 4, 2.0f, 0.45f);
+    f32 elevation = m_elevationNoise.FBM2D(nx, nz, 3, 2.0f, 0.5f);
     // Gentle micro-variation for subtle surface detail
     f32 detail = m_detailNoise.FBM2D((f32)worldX * 0.04f, (f32)worldZ * 0.04f, 2, 2.0f, 0.4f);
 
@@ -79,8 +79,8 @@ BlockType TerrainGenerator::GetSurfaceBlock(i32 worldX, i32 worldZ) const {
 
 TerrainGenerator::Biome TerrainGenerator::GetBiome(f32 worldX, f32 worldZ) const {
     // Use multiple noise samples around the point to smooth biome transitions
-    f32 temp = m_temperatureNoise.FBM2D(worldX * 0.004f, worldZ * 0.004f, 3);
-    f32 moisture = m_moistureNoise.FBM2D(worldX * 0.004f, worldZ * 0.004f, 3);
+    f32 temp = m_temperatureNoise.FBM2D(worldX * 0.004f, worldZ * 0.004f, 2);
+    f32 moisture = m_moistureNoise.FBM2D(worldX * 0.004f, worldZ * 0.004f, 2);
     f32 ridge = m_elevationNoise.FBM2D(worldX * 0.008f, worldZ * 0.008f, 2, 2.0f, 0.5f);
 
     // Mountains: high ridge noise value
