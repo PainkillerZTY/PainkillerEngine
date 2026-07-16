@@ -46,7 +46,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                         for line in c.split("\n"):
                             if "**AI**" in line:
                                 a = line.split(":")[-1].strip()
-                            if line.strip().startswith("- ") and not s:
+                            if line.strip().startswith("- ") and not line.strip().startswith("- **") and not s:
                                 s = line.strip()[2:80]
                         sessions.append({"d": d, "a": a, "s": s or fn.replace(".md", "")})
             # Team
@@ -66,7 +66,16 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                     if "IN_PROGRESS" in c:
                         team[i + 2]["s"] = "active"
             
-            data = {"tasks": tasks, "sessions": sessions, "team": team}
+            def sanitize(obj):
+                if isinstance(obj, str):
+                    return "".join(ch for ch in obj if 32 <= ord(ch) < 128)
+                elif isinstance(obj, list):
+                    return [sanitize(item) for item in obj]
+                elif isinstance(obj, dict):
+                    return {k: sanitize(v) for k, v in obj.items()}
+                return obj
+        
+            data = sanitize({"tasks": tasks, "sessions": sessions, "team": team})
             self.send_response(200)
             self.send_header("Content-Type", "application/json; charset=utf-8")
             self.send_header("Access-Control-Allow-Origin", "*")

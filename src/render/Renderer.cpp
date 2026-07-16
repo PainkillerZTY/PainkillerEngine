@@ -8,7 +8,7 @@ Renderer* Renderer::Create(RenderBackend backend) {
         case RenderBackend::OpenGL:
             // OpenGLRenderer defined in OpenGLRenderer.h
             break;
-        case RenderBackend::DirectX12:
+        case RenderBackend::DirectX11:
         case RenderBackend::Vulkan:
             // Not yet implemented
             break;
