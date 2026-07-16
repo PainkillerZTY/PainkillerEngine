@@ -191,7 +191,7 @@ static const char* kSkyboxFragmentSrc = R"(
 )";
 
 // ============================================================
-// VoxelGame Implementation
+// VoxelGame Implementation 
 // ============================================================
 VoxelGame::VoxelGame() {}
 VoxelGame::~VoxelGame() { Shutdown(nullptr); }
