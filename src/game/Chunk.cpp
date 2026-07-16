@@ -139,6 +139,39 @@ void Chunk::GenerateMesh(i32 chunkX, i32 chunkZ) {
 // Vertex format: pos(3) + normal(3) + texcoord(2) + uv(2) = 10 floats
 // texcoord encodes (blockType/255, faceIndex/6)
 // ============================================================
+
+// LOD
+void Chunk::GenerateLODMesh(i32 cx, i32 cz) {
+    m_lodVertices.clear(); m_lodIndices.clear();
+    m_lodVertexCount=0; m_lodIndexCount=0; m_hasLODMesh=false;
+    f32 bx=(f32)(cx*16), bz=(f32)(cz*16);
+    for(i32 y=0;y<128;y+=2) for(i32 z=0;z<16;z+=2) for(i32 x=0;x<16;x+=2){
+        BlockType mt=BlockType::Air; bool fnd=false;
+        for(i32 dy=0;dy<2&&!fnd;dy++) for(i32 dz=0;dz<2&&!fnd;dz++) for(i32 dx=0;dx<2&&!fnd;dx++){
+            BlockType b=GetBlock(x+dx,y+dy,z+dz);
+            if(b!=BlockType::Air){mt=b;fnd=true;}}
+        if(!fnd)continue;
+        Vec3 wo(bx+(f32)x,(f32)y,bz+(f32)z);
+        for(i32 f=0;f<6;f++){
+            i32 nx=x+(f==0?2:f==1?-2:0),ny=y+(f==2?2:f==3?-2:0),nz=z+(f==4?2:f==5?-2:0);
+            BlockType nb=BlockType::Air;
+            if(IsLocalCoordValid(nx,ny,nz)){
+                for(i32 dy=0;dy<2&&nb==BlockType::Air;dy++) for(i32 dz=0;dz<2&&nb==BlockType::Air;dz++) for(i32 dx=0;dx<2&&nb==BlockType::Air;dx++)
+                    nb=GetBlock(nx+dx,ny+dy,nz+dz);}
+            if(nb!=BlockType::Air)continue;
+            f32 tu=(f32)(u8)mt/255.0f, tv=(f32)f/6.0f;
+            Vec3 v0=kFaceVerts[f][0]*2.0f+wo; Vec3 v1=kFaceVerts[f][1]*2.0f+wo;
+            Vec3 v2=kFaceVerts[f][2]*2.0f+wo; Vec3 v3=kFaceVerts[f][3]*2.0f+wo;
+            Vec3 vs[4]={v0,v1,v2,v3};
+            for(i32 i=0;i<4;i++){
+                m_lodVertices.push_back(vs[i].x);m_lodVertices.push_back(vs[i].y);m_lodVertices.push_back(vs[i].z);
+                m_lodVertices.push_back(kFaceNormals[f].x);m_lodVertices.push_back(kFaceNormals[f].y);m_lodVertices.push_back(kFaceNormals[f].z);
+                m_lodVertices.push_back(tu);m_lodVertices.push_back(tv);}
+            u32 idx=m_lodVertexCount;
+            m_lodIndices.push_back(idx);m_lodIndices.push_back(idx+1);m_lodIndices.push_back(idx+2);
+            m_lodIndices.push_back(idx);m_lodIndices.push_back(idx+2);m_lodIndices.push_back(idx+3);
+            m_lodVertexCount+=4;m_lodIndexCount+=6;}}
+    m_hasLODMesh=m_lodIndexCount>0;}
 void Chunk::AddFace(const Vec3& v0, const Vec3& v1, const Vec3& v2, const Vec3& v3,
                     const Vec3& normal, BlockType blockType, BlockFace face) {
     // Encode block type and face into texcoord

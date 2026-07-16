@@ -60,7 +60,12 @@ public:
     const std::vector<u32>& GetIndexData() const { return m_indices; }
     u32 GetVertexCount() const { return m_vertexCount; }
     u32 GetIndexCount() const { return m_indexCount; }
-    u32 GetVertexStride() const { return 8 * sizeof(f32); } // pos(3) + normal(3) + texcoord(2)
+    u32 GetVertexStride() const { return 8 * sizeof(f32); }
+    bool HasLODMesh() const { return m_hasLODMesh; }
+    const std::vector<f32>& GetLODVertexData() const { return m_lodVertices; }
+    u32 GetLODVertexCount() const { return m_lodVertexCount; }
+    u32 GetLODIndexCount() const { return m_lodIndexCount; }
+    void GenerateLODMesh(i32 chunkX, i32 chunkZ);
 
     // Position
     i32 GetChunkX() const { return m_chunkX; }
@@ -97,6 +102,11 @@ private:
     bool m_hasMesh = false;
 
     bool m_meshDirty = true;
+    bool m_hasLODMesh = false;
+    std::vector<f32> m_lodVertices;
+    std::vector<u32> m_lodIndices;
+    u32 m_lodVertexCount = 0;
+    u32 m_lodIndexCount = 0;
 };
 
 // ============================================================

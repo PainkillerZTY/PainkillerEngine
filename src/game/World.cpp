@@ -15,6 +15,8 @@ World::World(Renderer* renderer)
 }
 
 World::~World() {
+    for(auto& e:m_lodChunkRenderData){if(e.second!=kInvalidHandle&&m_renderer)m_renderer->DestroyMesh(e.second);}
+    m_lodChunkRenderData.clear();
     // Clean up all chunk render data
     for (auto& entry : m_chunkRenderData) {
         ChunkRenderData& data = entry.second;
@@ -71,7 +73,10 @@ Chunk* World::LoadChunk(i32 chunkX, i32 chunkZ) {
 
 void World::UnloadChunk(i32 chunkX, i32 chunkZ) {
     ChunkPos pos(chunkX, chunkZ);
-
+    auto lodIt=m_lodChunkRenderData.find(pos);
+    if(lodIt!=m_lodChunkRenderData.end()){
+        if(lodIt->second!=kInvalidHandle&&m_renderer) m_renderer->DestroyMesh(lodIt->second);
+        m_lodChunkRenderData.erase(lodIt);}
     auto renderIt = m_chunkRenderData.find(pos);
     if (renderIt != m_chunkRenderData.end()) {
         if (renderIt->second.meshHandle != kInvalidHandle && m_renderer) {
@@ -182,7 +187,14 @@ void World::UploadChunkMesh(Chunk* chunk) {
         renderData.meshHandle = handle;
         m_chunkRenderData[pos] = renderData;
     }
-}
+    // Upload LOD mesh
+    chunk->GenerateLODMesh(pos.x,pos.z);
+    if(chunk->HasLODMesh()){
+        MeshData ld; ld.vertices=chunk->GetLODVertexData();
+        ld.vertexCount=chunk->GetLODVertexCount(); ld.indexCount=chunk->GetLODIndexCount();
+        ld.vertexStride=8*sizeof(f32);
+        MeshHandle lh=m_renderer->CreateMesh(ld);
+        if(lh!=kInvalidHandle) m_lodChunkRenderData[pos]=lh;} }
 
 // ============================================================
 // Rendering
@@ -194,6 +206,10 @@ void World::Render(Renderer* renderer, const Frustum* frustum) {
         const ChunkPos& pos = entry.first;
         ChunkRenderData& data = entry.second;
         if (data.meshHandle == kInvalidHandle) continue;
+        f32 dist=std::sqrt((f32)(pos.x*pos.x+pos.z*pos.z));
+        if(dist>4.0f){
+            auto lit=m_lodChunkRenderData.find(pos);
+            if(lit!=m_lodChunkRenderData.end()){renderer->DrawMesh(lit->second);continue;}}
         
         // Frustum culling: check chunk AABB against frustum
         if (frustum) {

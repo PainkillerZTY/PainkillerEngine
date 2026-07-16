@@ -122,6 +122,7 @@ private:
         MeshHandle meshHandle = kInvalidHandle;
     };
     std::unordered_map<ChunkPos, ChunkRenderData, ChunkPos::Hash> m_chunkRenderData;
+    std::unordered_map<ChunkPos, MeshHandle, ChunkPos::Hash> m_lodChunkRenderData;
 
     Renderer* m_renderer = nullptr;
     u32 m_seed = 42;
