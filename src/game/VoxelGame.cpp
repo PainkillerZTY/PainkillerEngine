@@ -623,7 +623,7 @@ void VoxelGame::SetupShadersAndPipeline(Renderer* renderer) {
         pd.vertexShader = &m_worldVSDesc;
         pd.fragmentShader = &m_worldFSDesc;
         pd.topology = PrimitiveTopology::TriangleList;
-        pd.cullMode = CullMode::None;
+        pd.cullMode = CullMode::Back;
         pd.fillMode = FillMode::Solid;
         pd.depthTestEnabled = true;
         pd.depthWriteEnabled = true;
