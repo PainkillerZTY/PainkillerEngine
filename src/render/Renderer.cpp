@@ -1,19 +1,20 @@
 #include "Renderer.h"
+#include "OpenGLRenderer.h"
+#include "DirectX11Renderer.h"
+#include "VulkanRenderer.h"
 
 namespace painkiller {
 
-// ?? Factory ??
 Renderer* Renderer::Create(RenderBackend backend) {
     switch (backend) {
         case RenderBackend::OpenGL:
-            // OpenGLRenderer defined in OpenGLRenderer.h
-            break;
+            return OpenGLRenderer::Create();
         case RenderBackend::DirectX11:
+            return DirectX11Renderer::Create();
         case RenderBackend::Vulkan:
-            // Not yet implemented
-            break;
+            return VulkanRenderer::Create();
     }
-    return nullptr; // Concrete implementation creates via static method
+    return nullptr;
 }
 
 } // namespace painkiller
