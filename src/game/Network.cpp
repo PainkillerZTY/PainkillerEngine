@@ -27,6 +27,18 @@ for(auto& cl : m_clients){
 }
 #endif
 }
+void NetworkServer::SendTo(int clientId, const u8* data, u32 size){
+#ifdef _WIN32
+for(auto& cl : m_clients){
+    if(cl.id == clientId){
+        u32 len = size;
+        ::send(cl.socket, (const char*)&len, 4, 0);
+        ::send(cl.socket, (const char*)data, size, 0);
+        return;
+    }
+}
+#endif
+}
 void NetworkServer::Update(){
 #ifdef _WIN32
 if(!m_running)return;
@@ -90,6 +102,58 @@ return true;}
 void NetworkClient::Disconnect(){m_connected=false;
 #ifdef _WIN32
 if(m_socket!=INVALID_SOCKET){closesocket(m_socket);m_socket=INVALID_SOCKET;}WSACleanup();
+#endif
+}
+void NetworkClient::Update(){
+#ifdef _WIN32
+if(!m_connected || m_socket == INVALID_SOCKET) return;
+// Non-blocking recv loop
+u8 buf[4096];
+int ret = ::recv(m_socket, (char*)buf, sizeof(buf), 0);
+if(ret > 0){
+    // Append to recv buffer
+    m_recvBuf.insert(m_recvBuf.end(), buf, buf + ret);
+    // Process as many complete packets as we can
+    while(true){
+        if(m_recvState == 0){
+            // Waiting for 4-byte length prefix
+            if(m_recvBuf.size() < 4) break;
+            m_pendingLen = ((u32)m_recvBuf[0]<<24)|((u32)m_recvBuf[1]<<16)|((u32)m_recvBuf[2]<<8)|(u32)m_recvBuf[3];
+            m_recvBuf.erase(m_recvBuf.begin(), m_recvBuf.begin() + 4);
+            m_recvState = 1;
+            m_pendingData.clear();
+        }
+        if(m_recvState == 1){
+            // Waiting for payload
+            if(m_recvBuf.size() < m_pendingLen) break;
+            m_pendingData.assign(m_recvBuf.begin(), m_recvBuf.begin() + m_pendingLen);
+            m_recvBuf.erase(m_recvBuf.begin(), m_recvBuf.begin() + m_pendingLen);
+            m_recvState = 0;
+            if(m_onPacket)
+                m_onPacket(m_pendingData.data(), (u32)m_pendingData.size());
+        }
+    }
+} else if(ret == 0){
+    // Clean disconnect
+    m_connected = false;
+    closesocket(m_socket); m_socket = INVALID_SOCKET;
+    if(m_onDisconnect) m_onDisconnect();
+} else {
+    int err = WSAGetLastError();
+    if(err != WSAEWOULDBLOCK){
+        m_connected = false;
+        closesocket(m_socket); m_socket = INVALID_SOCKET;
+        if(m_onDisconnect) m_onDisconnect();
+    }
+}
+#endif
+}
+void NetworkClient::Send(const u8* data, u32 size){
+#ifdef _WIN32
+if(!m_connected || m_socket == INVALID_SOCKET) return;
+u32 len = size;
+::send(m_socket, (const char*)&len, 4, 0);
+::send(m_socket, (const char*)data, size, 0);
 #endif
 }
 }

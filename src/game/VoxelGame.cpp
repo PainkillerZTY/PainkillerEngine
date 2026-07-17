@@ -767,6 +767,14 @@ void VoxelGame::Update(Engine* engine, f32 deltaTime) {
      if (engine->GetInput()->IsKeyPressed(VK_F3)) {
          m_isDebugMode = !m_isDebugMode;
      }
+     // Toggle inventory with E
+     if (engine->GetInput()->IsKeyPressed('E')) {
+         m_inventoryOpen = !m_inventoryOpen;
+         m_craftingOpen = false;
+         m_furnaceOpen = false;
+     }
+     // Survival tick
+     UpdateSurvival(deltaTime);
      m_particleSystem.Update(deltaTime);
      // Network: broadcast player position to connected clients
      if (m_networkServer.GetClientCount() > 0) {
@@ -847,9 +855,51 @@ void VoxelGame::HandleBlockInteraction(Engine* engine, f32 deltaTime) {
             }
         }
     }
-    
+
+    // Crafting click-to-craft (when crafting GUI is open, left click on recipe)
+    if (m_craftingOpen && input->IsMousePressed(0)) {
+        f32 mx = (f32)input->GetMouseX();
+        f32 winW = (f32)engine->GetWindow()->GetWidth();
+        f32 winH = (f32)engine->GetWindow()->GetHeight();
+        f32 my = winH - (f32)input->GetMouseY();
+        f32 slotSize = 30.0f, gap = 3.0f;
+        f32 cx = winW * 0.1f, cy = winH * 0.7f;
+
+        struct Recipe { BlockType input; BlockType output; };
+        Recipe recipes[] = {
+            {BlockType::OakLog, BlockType::OakPlanks},
+            {BlockType::OakPlanks, BlockType::CraftingTable},
+            {BlockType::Stone, BlockType::Furnace},
+            {BlockType::Cobblestone, BlockType::Stone},
+        };
+        int numRecipes = sizeof(recipes) / sizeof(recipes[0]);
+
+        for (int i = 0; i < numRecipes; i++) {
+            f32 rx = cx + (i % 4) * (slotSize * 2.5f + gap);
+            f32 ry = cy - (i / 4) * (slotSize + gap + 20);
+            f32 totalW = slotSize * 2.7f;
+            if (mx >= rx && mx <= rx + totalW && my >= ry && my <= ry + slotSize) {
+                // Check if player has the ingredient
+                if (HasItem(recipes[i].input)) {
+                    RemoveItem(recipes[i].input);
+                    CollectItem(recipes[i].output);
+                    m_soundManager.PlayBlockPlace();
+                }
+                break;
+            }
+        }
+    }
+
     // Block placement (right-click)
     if (input->IsMousePressed(1) && m_raycastResult.hit && m_placeCooldown <= 0.0f) {
+        // If any GUI is open, right-click closes it without placing blocks
+        if (m_inventoryOpen || m_craftingOpen || m_furnaceOpen) {
+            m_inventoryOpen = false;
+            m_craftingOpen = false;
+            m_furnaceOpen = false;
+            m_placeCooldown = 0.1f;
+            return;
+        }
         // Check for special interactions first
         BlockType hitBlock = m_world->GetBlock(m_raycastResult.blockX,m_raycastResult.blockY,m_raycastResult.blockZ);
         bool handled = false;
@@ -959,6 +1009,7 @@ void VoxelGame::Render(Engine* engine, f32 deltaTime) {
 
 void VoxelGame::RenderWorld(Renderer* renderer, Camera* camera) {
     renderer->BindPipelineState(m_worldPipeline);
+    renderer->SetUniformFloat("u_BlockAtlasCell", 0.0f);
     renderer->SetUniformMat4("u_View", camera->GetViewMatrix());
     renderer->SetUniformMat4("u_Projection", camera->GetProjectionMatrix());
     renderer->SetUniformVec3("u_CameraPos", camera->GetPosition());
@@ -1256,6 +1307,9 @@ void VoxelGame::RenderHeldBlock(Renderer* renderer, Camera* camera) {
         renderer->BindTexture(m_blockAtlas, 0);
         renderer->SetUniformInt("u_BlockAtlas", 0);
     }
+    // Dynamically set the held block type so it reflects the current selection
+    float heldBlockTypeVal = (float)(u8)GetSelectedBlock() / 255.0f;
+    renderer->SetUniformFloat("u_BlockAtlasCell", heldBlockTypeVal);
     renderer->DrawMesh(m_heldBlockMesh);
 }
 
