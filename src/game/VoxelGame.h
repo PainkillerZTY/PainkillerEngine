@@ -65,6 +65,7 @@ private:
     void SpawnHostileMob(const Vec3& pos, MobType type);
     void CollectItem(BlockType type);
     bool HasItem(BlockType type) const;
+    void RemoveItem(BlockType type);
 
     // World
     World* m_world = nullptr;

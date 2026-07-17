@@ -61,10 +61,10 @@ BlockRaycastResult BlockRaycast::Cast(const Vec3& origin, const Vec3& direction,
             else if (lastFaceZ > 0) result.hitFace = BlockFace::Front;
             else if (lastFaceZ < 0) result.hitFace = BlockFace::Back;
 
-            // Calculate place position
-            result.placeX = bx + lastFaceX;
-            result.placeY = by + lastFaceY;
-            result.placeZ = bz + lastFaceZ;
+            // Calculate place position (invert: place on the NEAR side, where the player is looking)
+            result.placeX = bx - lastFaceX;
+            result.placeY = by - lastFaceY;
+            result.placeZ = bz - lastFaceZ;
 
             result.distance = sqrtf((bx + 0.5f - origin.x) * (bx + 0.5f - origin.x) +
                                      (by + 0.5f - origin.y) * (by + 0.5f - origin.y) +

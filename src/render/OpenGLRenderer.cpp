@@ -237,13 +237,13 @@ PipelineHandle OpenGLRenderer::CreatePipelineState(const PipelineStateDesc& d){
     if(!vs||!fs)return kInvalidHandle;
     p.programHandle=pfnCreateProgram();
     if(!LinkProgram(p.programHandle,vs,fs)){pfnDeleteProgram(p.programHandle);return kInvalidHandle;}
-    pfnGenVertexArrays(1,&p.vaoHandle);pfnBindVertexArray(p.vaoHandle);
+    p.blendMode=d.blendMode;pfnGenVertexArrays(1,&p.vaoHandle);pfnBindVertexArray(p.vaoHandle);
     for(size_t i=0;i<d.vertexLayout.size();++i){
         const auto& e=d.vertexLayout[i];pfnEnableVertexAttribArray((GLuint)i);
         int cc=3;if(e.format==Format::R32G32B32A32_FLOAT)cc=4;else if(e.format==Format::R32G32_FLOAT)cc=2;else if(e.format==Format::R32_FLOAT)cc=1;
         pfnVertexAttribPointer((GLuint)i,cc,GL_FLOAT,GL_FALSE,0,(void*)(size_t)e.offset);}
     pfnBindVertexArray(0);pfnDeleteShader(vs);pfnDeleteShader(fs);
-    m_pipelines.push_back(p);return (PipelineHandle)(m_pipelines.size()-1);}
+    p.blendMode=d.blendMode;m_pipelines.push_back(p);return (PipelineHandle)(m_pipelines.size()-1);}
 MeshHandle OpenGLRenderer::CreateMesh(const MeshData& d){
     GLMesh m;m.vertexCount=d.vertexCount;m.indexCount=d.indexCount;m.vertexStride=d.vertexStride;
     pfnGenVertexArrays(1,&m.vaoHandle);pfnBindVertexArray(m.vaoHandle);
@@ -259,7 +259,7 @@ void OpenGLRenderer::DestroyBuffer(BufferHandle h){if(h<m_buffers.size()&&m_buff
 void OpenGLRenderer::DestroyTexture(TextureHandle h){if(h<m_textures.size()&&m_textures[h].glHandle){pfnDeleteTextures(1,&m_textures[h].glHandle);m_textures[h].glHandle=0;}}
 void OpenGLRenderer::DestroyPipelineState(PipelineHandle h){if(h<m_pipelines.size()){if(m_pipelines[h].programHandle)pfnDeleteProgram(m_pipelines[h].programHandle);if(m_pipelines[h].vaoHandle)pfnDeleteVertexArrays(1,&m_pipelines[h].vaoHandle);}}
 void OpenGLRenderer::DestroyMesh(MeshHandle h){if(h<m_meshes.size()){auto& me=m_meshes[h];if(me.vertexBuffer)pfnDeleteBuffers(1,&me.vertexBuffer);if(me.indexBuffer)pfnDeleteBuffers(1,&me.indexBuffer);if(me.vaoHandle)pfnDeleteVertexArrays(1,&me.vaoHandle);}}
-void OpenGLRenderer::BindPipelineState(PipelineHandle h){if(h>=m_pipelines.size())return;m_activePipeline=&m_pipelines[h];pfnUseProgram(m_activePipeline->programHandle);pfnBindVertexArray(m_activePipeline->vaoHandle);}
+void OpenGLRenderer::BindPipelineState(PipelineHandle h){if(h>=m_pipelines.size())return;m_activePipeline=&m_pipelines[h];pfnUseProgram(m_activePipeline->programHandle);pfnBindVertexArray(m_activePipeline->vaoHandle);if(m_activePipeline->blendMode==BlendMode::Opaque)glDisable(GL_BLEND);else glEnable(GL_BLEND);}
 void OpenGLRenderer::BindVertexBuffer(BufferHandle h,u32){if(h<m_buffers.size())pfnBindBuffer(GL_ARRAY_BUFFER,m_buffers[h].glHandle);}
 void OpenGLRenderer::BindIndexBuffer(BufferHandle h){if(h<m_buffers.size())pfnBindBuffer(GL_ELEMENT_ARRAY_BUFFER,m_buffers[h].glHandle);}
 void OpenGLRenderer::BindTexture(TextureHandle h,u32 s){if(h<m_textures.size()){pfnActiveTexture(GL_TEXTURE0+s);pfnBindTexture(GL_TEXTURE_2D,m_textures[h].glHandle);}}

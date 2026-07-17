@@ -1379,6 +1379,13 @@ bool VoxelGame::HasItem(BlockType type) const {
     return (idx >= 0 && idx < kMaxInventory) ? m_inventory[idx] > 0 : false;
 }
 
+void VoxelGame::RemoveItem(BlockType type) {
+    i32 idx = (i32)type;
+    if (idx >= 0 && idx < kMaxInventory && m_inventory[idx] > 0) {
+        m_inventory[idx]--;
+    }
+}
+
 void VoxelGame::ApplyFallDamage() {
     Vec3 vel = m_player.GetVelocity();
     bool onGround = m_player.IsOnGround();

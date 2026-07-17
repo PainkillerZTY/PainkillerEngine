@@ -70,7 +70,7 @@ private:
     struct GLShader   { ShaderStage stage; u32 glHandle = 0; };
     struct GLBuffer   { BufferType type; u32 glHandle = 0; u32 size = 0; u32 stride = 0; };
     struct GLTexture  { u32 glHandle = 0; u32 width = 0; u32 height = 0; Format format;  };
-    struct GLPipeline { u32 programHandle = 0; u32 vaoHandle = 0; PrimitiveTopology topology; };
+    struct GLPipeline { u32 programHandle = 0; u32 vaoHandle = 0; PrimitiveTopology topology; BlendMode blendMode = BlendMode::Opaque; };
     struct GLMesh     { u32 vaoHandle = 0; u32 vertexBuffer = 0; u32 indexBuffer = 0; u32 vertexCount = 0; u32 indexCount = 0; u32 vertexStride = 0; };
 
     u32 CompileGLShader(ShaderStage stage, const std::string& source);
